@@ -25,7 +25,10 @@ SECRET_KEY = "django-insecure-5g(i3--=k3qt7r_v0g%wt6lrf4a9)v)qu2zl5lo2mpa!g_3qre
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',  # Localhost
+    '10.0.0.245',  # Your Mac's local IP
+]
 
 LOGIN_REDIRECT_URL = 'home'  # Redirect to the homepage after login
 LOGOUT_REDIRECT_URL = 'home'  # Redirect to the homepage after logout
