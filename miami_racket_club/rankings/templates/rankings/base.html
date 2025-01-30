@@ -1,32 +1,109 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Miami Racket Club</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Alegreya Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        /* Apply Alegreya font to the entire app */
+        body {
+            font-family: 'Alegreya', serif;
+            background-color: #104730; /* Dark green background */
+            color: #ffffff; /* White body text */
+        }
+
+        /* Titles and subtitles */
+        h1, h2, h3, h4, h5, h6 {
+            color: #c8c097; /* Light beige for titles and subtitles */
+        }
+
+        /* Navbar styling */
+        .navbar {
+            background-color: #104730; /* Dark green navbar */
+            border-bottom: 1px solid #c8c097; /* Light beige border */
+        }
+
+        .navbar-brand, .nav-link {
+            color: #c8c097 !important; /* Light beige text for navbar links */
+        }
+
+        .navbar-brand img {
+            height: 40px; /* Adjust logo height */
+            margin-right: 10px; /* Space between logo and text */
+        }
+
+        .navbar-text {
+            color: #c8c097 !important; /* Light beige text for navbar text */
+        }
+
+        /* Button styling */
+        .btn-link {
+            color: #c8c097 !important; /* Light beige text for buttons */
+        }
+
+        .btn-link:hover {
+            color: #ffffff !important; /* White text on hover */
+        }
+
+        /* Table styling */
+        .table {
+            color: #ffffff; /* White text for tables */
+        }
+
+        .table th {
+            color: #c8c097; /* Light beige for table headers */
+        }
+
+        /* Link styling */
+        a {
+            color: #c8c097; /* Light beige for links */
+        }
+
+        a:hover {
+            color: #ffffff; /* White for links on hover */
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">Miami Racket Club</a>
+            <!-- Logo and Brand -->
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'rankings/logo.png' %}" alt="Miami Racket Club Logo">
+                Miami Racket Club
+            </a>
+            <!-- Navbar Links -->
             <div class="navbar-nav">
                 {% if user.is_authenticated %}
+                    <!-- Welcome message and logout button -->
                     <span class="navbar-text me-3">Welcome, {{ user.username }}!</span>
                     <form action="{% url 'logout' %}" method="post" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-link nav-link p-0">Log out</button>
                     </form>
                 {% else %}
+                    <!-- Login and signup links -->
                     <a class="nav-link" href="{% url 'login' %}">Log in</a>
                     <a class="nav-link" href="{% url 'signup' %}">Sign up</a>
                 {% endif %}
             </div>
         </div>
     </nav>
+
+    <!-- Main Content -->
     <div class="container mt-4">
         {% block content %}
         {% endblock %}
     </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
