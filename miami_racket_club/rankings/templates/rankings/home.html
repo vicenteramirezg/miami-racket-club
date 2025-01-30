@@ -1,0 +1,12 @@
+{% extends 'rankings/base.html' %}
+
+{% block content %}
+<h1 class="my-4">Welcome to Miami Racket Club</h1>
+<p>Track your matches and see the leaderboard!</p>
+{% if user.is_authenticated %}
+    <p><a href="{% url 'submit_match' %}">Submit a match</a></p>
+    <p><a href="{% url 'leaderboard' %}">View the leaderboard</a></p>
+{% else %}
+    <p>Please <a href="{% url 'login' %}">log in</a> to submit matches or view the leaderboard.</p>
+{% endif %}
+{% endblock %}
