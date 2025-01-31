@@ -20,9 +20,10 @@ from rankings.views import SignUpView
 from rankings import views
 
 urlpatterns = [
-    path('', views.home, name='home'),  # Ensure this is named 'home'
+    path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup/', SignUpView.as_view(), name='signup'),
+    path('profile/<str:username>/', views.profile, name='profile'),
     path('', include('rankings.urls')),
 ]

@@ -1,0 +1,62 @@
+{% extends 'rankings/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">{{ player.user.username }}'s Profile</h1>
+
+    <!-- Player Details -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Player Information</h5>
+            <p class="card-text">
+                <strong>Name:</strong> {{ player.user.username }}<br>
+                <strong>USTA Rating:</strong> {{ player.usta_rating }}<br>
+                <strong>ELO Rating:</strong> {{ player.elo_rating }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Match History -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Match History</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Opponent</th>
+                        <th>Result</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in matches %}
+                    <tr>
+                        <td>{{ match.date|date:"Y-m-d" }}</td>
+                        <td>
+                            {% if match.winner == player %}
+                                {{ match.loser.user.username }}
+                            {% else %}
+                                {{ match.winner.user.username }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if match.winner == player %}
+                                <span class="text-success">Win</span>
+                            {% else %}
+                                <span class="text-danger">Loss</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ match.set_scores }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No matches found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
