@@ -4,6 +4,7 @@ import json
 
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    usta_rating = models.FloatField(default=3.00)
     elo_rating = models.IntegerField(default=1000)
 
     def __str__(self):
