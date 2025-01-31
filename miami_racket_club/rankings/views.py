@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
-from .forms import MatchForm
+from .forms import MatchForm, CustomSignUpForm  # Ensure this import is correct
 from .models import Player
 from django.contrib.auth.decorators import login_required
 
@@ -25,6 +26,12 @@ def home(request):
     return render(request, 'rankings/home.html')
 
 class SignUpView(CreateView):
-    form_class = UserCreationForm
-    success_url = reverse_lazy('login')
+    form_class = CustomSignUpForm  # Use the custom form
+    success_url = reverse_lazy('home')
     template_name = 'registration/signup.html'
+
+    def form_valid(self, form):
+        user = form.save()
+        Player.objects.create(user=user)
+        login(self.request, user)
+        return redirect(self.success_url)
