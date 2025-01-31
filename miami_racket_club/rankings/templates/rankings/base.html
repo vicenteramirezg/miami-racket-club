@@ -30,11 +30,12 @@
         }
 
         .navbar-brand, .nav-link {
+            display: flex;
             color: #c8c097 !important; /* Light beige text for navbar links */
         }
 
         .navbar-brand img {
-            height: 40px; /* Adjust logo height */
+            height: 60px; /* Adjust logo height */
             margin-right: 10px; /* Space between logo and text */
         }
 
@@ -68,29 +69,51 @@
         a:hover {
             color: #ffffff; /* White for links on hover */
         }
+
+        /* Navbar Button Styling */
+        .nav-link {
+            margin-right: 10px; /* Add space between buttons */
+        }
+
+        .nav-link.btn-primary {
+            background-color: #c8c097; /* Light beige */
+            color: #104730; /* Dark green */
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+        }
+
+        .nav-link.btn-primary:hover {
+            background-color: #ffffff; /* White */
+            color: #104730; /* Dark green */
+        }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container">
-            <!-- Logo and Brand -->
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'rankings/logo.png' %}" alt="Miami Racket Club Logo">
-                Miami Racket Club
-            </a>
-            <!-- Navbar Links -->
+        <div class="container d-flex align-items-center justify-content-between">
+            <!-- Left side: Logo and Welcome Message -->
+            <div class="d-flex align-items-center">
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                    <img src="{% static 'rankings/logo.png' %}" alt="Miami Racket Club Logo" class="logo-img">
+                </a>
+                {% if user.is_authenticated %}
+                    <span class="navbar-text ms-3">Welcome, {{ user.username }}!</span>
+                {% endif %}
+            </div>
+    
+            <!-- Right side: Navbar Links -->
             <div class="navbar-nav d-flex align-items-center">
                 {% if user.is_authenticated %}
-                    <!-- Welcome message and logout button -->
-                    <span class="navbar-text me-3">Welcome, {{ user.username }}!</span>
+                    <a class="nav-link" href="{% url 'submit_match' %}">Submit Match</a>
+                    <a class="nav-link" href="{% url 'leaderboard' %}">Leaderboard</a>
                     <a class="nav-link" href="{% url 'profile' user.username %}">My Profile</a>
                     <form action="{% url 'logout' %}" method="post" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-link nav-link p-0">Log out</button>
                     </form>
                 {% else %}
-                    <!-- Login and signup links -->
                     <a class="nav-link" href="{% url 'login' %}">Log in</a>
                     <a class="nav-link" href="{% url 'signup' %}">Sign up</a>
                 {% endif %}
