@@ -16,8 +16,10 @@ def submit_match(request):
     if request.method == 'POST':
         form = MatchForm(request.POST)
         if form.is_valid():
-            match = form.save()
-            send_match_notification(match)
+            match = form.save(commit=False)
+            match.set_scores = form.cleaned_data['set_scores']  # Save set scores
+            match.save()
+            send_match_notification(match)  # Send notification
             return redirect('leaderboard')
     else:
         form = MatchForm()
@@ -39,7 +41,8 @@ def send_match_notification(match):
         - 🆚 Opponent: {match.loser.user.username if player == match.winner else match.winner.user.username}
         - 🏆 Result: {"✅ Win" if player == match.winner else "❌ Lose"}
         - 📊 Score: {match.set_scores}
-        - 📅 Date: {match.date.date()} 
+        - 📅 Date: {match.date}
+        - 📝 Notes: {match.notes}
 
         Keep playing and improving! 🚀🔥
         '''

@@ -13,8 +13,9 @@ class Player(models.Model):
 class Match(models.Model):
     winner = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="won_matches")
     loser = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="lost_matches")
-    set_scores = models.JSONField(default=list)  # Default to an empty list
-    date = models.DateTimeField(auto_now_add=True)
+    set_scores = models.JSONField()
+    date = models.DateField(auto_now_add=False)  # Allow custom dates
+    notes = models.TextField(blank=True, null=True)  # Optional notes
 
     def __str__(self):
         return f"{self.winner} vs {self.loser} ({self.set_scores})"

@@ -1,10 +1,77 @@
 {% extends 'rankings/base.html' %}
 
 {% block content %}
-<h1 class="my-4">Submit Match</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+<div class="container">
+    <h1 class="my-4">Submit Match</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Winner Section -->
+                <div class="row mb-3 align-items-center">
+                    <div class="col-md-3">
+                        <label for="{{ form.winner.id_for_label }}">Winner</label>
+                        {{ form.winner }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ form.winner_games_set1.id_for_label }}">Set 1 Games</label>
+                        {{ form.winner_games_set1 }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ form.winner_games_set2.id_for_label }}">Set 2 Games</label>
+                        {{ form.winner_games_set2 }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ form.winner_games_set3.id_for_label }}">Set 3 Games</label>
+                        {{ form.winner_games_set3 }}
+                    </div>
+                </div>
+
+                <!-- Loser Section -->
+                <div class="row mb-3 align-items-center">
+                    <div class="col-md-3">
+                        <label for="{{ form.loser.id_for_label }}">Loser</label>
+                        {{ form.loser }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ form.loser_games_set1.id_for_label }}">Set 1 Games</label>
+                        {{ form.loser_games_set1 }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ form.loser_games_set2.id_for_label }}">Set 2 Games</label>
+                        {{ form.loser_games_set2 }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ form.loser_games_set3.id_for_label }}">Set 3 Games</label>
+                        {{ form.loser_games_set3 }}
+                    </div>
+                </div>
+
+                <!-- Date Picker -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="{{ form.date.id_for_label }}">Match Date</label>
+                        {{ form.date }}
+                    </div>
+                </div>
+
+                <!-- Notes Section -->
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="{{ form.notes.id_for_label }}">Notes</label>
+                        {{ form.notes }}
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -2,25 +2,33 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Match, Player
+from django.forms import DateInput
 
 class MatchForm(forms.ModelForm):
-    set_scores = forms.CharField(
-        label="Set Scores",
-        help_text="Enter set scores in the format '6-4 3-6 7-5'."
-    )
+    winner_games_set1 = forms.IntegerField(label='Set 1 Games (Winner)', min_value=0, max_value=7, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    loser_games_set1 = forms.IntegerField(label='Set 1 Games (Loser)', min_value=0, max_value=7, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    winner_games_set2 = forms.IntegerField(label='Set 2 Games (Winner)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    loser_games_set2 = forms.IntegerField(label='Set 2 Games (Loser)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    winner_games_set3 = forms.IntegerField(label='Set 3 Games (Winner)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    loser_games_set3 = forms.IntegerField(label='Set 3 Games (Loser)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    date = forms.DateField(label='Match Date', widget=DateInput(attrs={'type': 'date', 'class': 'form-control'}))
+    notes = forms.CharField(label='Notes', widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), required=False)
 
     class Meta:
         model = Match
-        fields = ['winner', 'loser', 'set_scores']
+        fields = ['winner', 'loser', 'date', 'notes']
 
-    def clean_set_scores(self):
-        set_scores = self.cleaned_data['set_scores']
-        try:
-            # Convert set scores to a list of tuples
-            sets = [tuple(map(int, s.split('-'))) for s in set_scores.split()]
-            return sets
-        except (ValueError, AttributeError):
-            raise forms.ValidationError("Invalid set scores format. Use '6-4 3-6 7-5'.")
+    def clean(self):
+        cleaned_data = super().clean()
+        # Combine set scores into the required format
+        set_scores = [
+            (cleaned_data.get('winner_games_set1'), cleaned_data.get('loser_games_set1')),
+            (cleaned_data.get('winner_games_set2'), cleaned_data.get('loser_games_set2')),
+        ]
+        if cleaned_data.get('winner_games_set3') is not None and cleaned_data.get('loser_games_set3') is not None:
+            set_scores.append((cleaned_data.get('winner_games_set3'), cleaned_data.get('loser_games_set3')))
+        cleaned_data['set_scores'] = set_scores
+        return cleaned_data
 
 # Helper function to generate floating point range
 def frange(start, stop, step):
