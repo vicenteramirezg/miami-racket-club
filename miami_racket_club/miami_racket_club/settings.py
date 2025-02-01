@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-5g(i3--=k3qt7r_v0g%wt6lrf4a9)v)qu2zl5lo2mpa!g_3qre"
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -132,6 +133,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'notifications@themiamiracketclub.com'  # Your Gmail address
-EMAIL_HOST_PASSWORD = 'ajoq zzzv ivpz wvws'  # Your Gmail app password
-DEFAULT_FROM_EMAIL = 'notifications@themiamiracketclub.com'  # Sender email
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')  # Your Gmail address
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  # Your Gmail app password
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')  # Sender email
