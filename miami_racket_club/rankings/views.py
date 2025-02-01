@@ -9,6 +9,7 @@ from .forms import MatchForm, CustomSignUpForm  # Ensure this import is correct
 from .models import Player, Match
 from django.contrib.auth.decorators import login_required
 from email.header import Header
+from email.utils import formataddr
 
 @login_required
 def submit_match(request):
@@ -27,12 +28,13 @@ def leaderboard(request):
     return render(request, 'rankings/leaderboard.html', {'players': players})
 
 def send_match_notification(match):
-    subject = Header("🎾 New Match Submitted!", "utf-8").encode()
+    from_email = formataddr(("🎾 Miami Racket Club", settings.DEFAULT_FROM_EMAIL))
+    subject = Header("New Match Submitted!", "utf-8").encode()
     
     # Loop through each player and send an individual email
     for player in [match.winner, match.loser]:
         message = f'''
-        🎉 A new match has been submitted! 🎾
+        🎉 A new match has been submitted!
 
         - 🆚 Opponent: {match.loser.user.username if player == match.winner else match.winner.user.username}
         - 🏆 Result: {"✅ Win" if player == match.winner else "❌ Lose"}
@@ -41,8 +43,8 @@ def send_match_notification(match):
 
         Keep playing and improving! 🚀🔥
         '''
-        recipient_list = [player.user.email]  # Send to one player at a time
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
+        recipient_list = [player.user.email]
+        send_mail(subject, message, from_email, recipient_list)
 
 def home(request):
     return render(request, 'rankings/home.html')
