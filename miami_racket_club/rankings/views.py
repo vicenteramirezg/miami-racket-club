@@ -8,6 +8,7 @@ from django.conf import settings
 from .forms import MatchForm, CustomSignUpForm  # Ensure this import is correct
 from .models import Player, Match
 from django.contrib.auth.decorators import login_required
+from email.header import Header
 
 @login_required
 def submit_match(request):
@@ -26,16 +27,22 @@ def leaderboard(request):
     return render(request, 'rankings/leaderboard.html', {'players': players})
 
 def send_match_notification(match):
-    subject = 'New Match Submitted'
-    message = f'''
-    A new match has been submitted:
-    - Winner: {match.winner.user.username}
-    - Loser: {match.loser.user.username}
-    - Score: {match.set_scores}
-    - Date: {match.date}
-    '''
-    recipient_list = [match.winner.user.email, match.loser.user.email]  # Send to both players
-    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
+    subject = Header("🎾 New Match Submitted!", "utf-8").encode()
+    
+    # Loop through each player and send an individual email
+    for player in [match.winner, match.loser]:
+        message = f'''
+        🎉 A new match has been submitted! 🎾
+
+        - 🆚 Opponent: {match.loser.user.username if player == match.winner else match.winner.user.username}
+        - 🏆 Result: {"✅ Win" if player == match.winner else "❌ Lose"}
+        - 📊 Score: {match.set_scores}
+        - 📅 Date: {match.date.date()} 
+
+        Keep playing and improving! 🚀🔥
+        '''
+        recipient_list = [player.user.email]  # Send to one player at a time
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
 
 def home(request):
     return render(request, 'rankings/home.html')
