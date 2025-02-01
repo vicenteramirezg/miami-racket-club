@@ -4,15 +4,39 @@
 <div class="container">
     <h1 class="my-4">{{ player.user.username }}'s Profile</h1>
 
-    <!-- Player Details -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Player Information</h5>
-            <p class="card-text">
-                <strong>Name:</strong> {{ player.user.username }}<br>
-                <strong>USTA Rating:</strong> {{ player.usta_rating }}<br>
-                <strong>ELO Rating:</strong> {{ player.elo_rating }}
-            </p>
+    <div class="row">
+        <!-- Player Details -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Player Information</h5>
+                    <p class="card-text">
+                        <strong>Name:</strong> {{ player.user.username }}<br>
+                        <strong>USTA Rating:</strong> {{ player.usta_rating }}<br>
+                        <strong>ELO Rating:</strong> {{ player.elo_rating }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Player Statistics -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Player Statistics</h5>
+                    <p class="card-text">
+                        <strong>Matches Played:</strong> {{ matches_played }}<br>
+                        <strong>Matches Won:</strong> {{ matches_won }}<br>
+                        <strong>Matches Lost:</strong> {{ matches_lost }}<br>
+                        <strong>Match Win Percentage:</strong> {{ match_win_percentage }}%<br>
+                        <strong>Sets Won:</strong> {{ sets_won }}<br>
+                        <strong>Sets Lost:</strong> {{ sets_lost }}<br>
+                        <strong>Games Won:</strong> {{ games_won }}<br>
+                        <strong>Games Lost:</strong> {{ games_lost }}<br>
+                        <strong>Game Win Percentage:</strong> {{ game_win_percentage }}%<br>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 

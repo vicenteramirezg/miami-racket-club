@@ -44,7 +44,46 @@ def profile(request, username):
     player = get_object_or_404(Player, user__username=username)
     matches = Match.objects.filter(winner=player) | Match.objects.filter(loser=player)
     matches = matches.order_by('-date')  # Show most recent matches first
-    return render(request, 'rankings/profile.html', {'player': player, 'matches': matches})
+
+    # Calculate statistics
+    matches_played = matches.count()
+    matches_won = matches.filter(winner=player).count()
+    matches_lost = matches_played - matches_won
+    match_win_percentage = (matches_won / matches_played) * 100 if matches_played > 0 else 0
+
+    sets_won = 0
+    sets_lost = 0
+    games_won = 0
+    games_lost = 0
+
+    for match in matches:
+        for set_score in match.set_scores:
+            if match.winner == player:
+                sets_won += 1
+                games_won += set_score[0]
+                games_lost += set_score[1]
+            else:
+                sets_lost += 1
+                games_won += set_score[1]
+                games_lost += set_score[0]
+
+    game_win_percentage = (games_won / (games_won + games_lost)) * 100 if (games_won + games_lost) > 0 else 0
+
+    context = {
+        'player': player,
+        'matches': matches,
+        'matches_played': matches_played,
+        'matches_won': matches_won,
+        'matches_lost': matches_lost,
+        'match_win_percentage': round(match_win_percentage, 1),  # Round to 2 decimal places
+        'sets_won': sets_won,
+        'sets_lost': sets_lost,
+        'games_won': games_won,
+        'games_lost': games_lost,
+        'game_win_percentage': round(game_win_percentage, 1),  # Round to 2 decimal places
+    }
+
+    return render(request, 'rankings/profile.html', context)
 
 class SignUpView(CreateView):
     form_class = CustomSignUpForm  # Use the custom form
