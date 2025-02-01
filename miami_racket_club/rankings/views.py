@@ -3,6 +3,8 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
+from django.core.mail import send_mail
+from django.conf import settings
 from .forms import MatchForm, CustomSignUpForm  # Ensure this import is correct
 from .models import Player, Match
 from django.contrib.auth.decorators import login_required
@@ -12,7 +14,8 @@ def submit_match(request):
     if request.method == 'POST':
         form = MatchForm(request.POST)
         if form.is_valid():
-            form.save()
+            match = form.save()
+            send_match_notification(match)
             return redirect('leaderboard')
     else:
         form = MatchForm()
@@ -21,6 +24,18 @@ def submit_match(request):
 def leaderboard(request):
     players = Player.objects.order_by('-elo_rating')
     return render(request, 'rankings/leaderboard.html', {'players': players})
+
+def send_match_notification(match):
+    subject = 'New Match Submitted'
+    message = f'''
+    A new match has been submitted:
+    - Winner: {match.winner.user.username}
+    - Loser: {match.loser.user.username}
+    - Score: {match.set_scores}
+    - Date: {match.date}
+    '''
+    recipient_list = [match.winner.user.email, match.loser.user.email]  # Send to both players
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
 
 def home(request):
     return render(request, 'rankings/home.html')
