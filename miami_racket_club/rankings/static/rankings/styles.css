@@ -12,3 +12,25 @@
     border-radius: 0.25rem;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
+
+/* Style links globally */
+a {
+    color: #c8c097; /* Black text */
+    text-decoration: none; /* Remove underline */
+}
+
+a:hover {
+    color: #ffffff; /* Light beige on hover */
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* Style player name links only on the leaderboard page */
+.leaderboard-page a {
+    color: #000000; /* Black text */
+    text-decoration: none; /* Remove underline */
+}
+
+.leaderboard-page a:hover {
+    color: #c8c097; /* Light beige on hover */
+    text-decoration: underline; /* Add underline on hover */
+}
