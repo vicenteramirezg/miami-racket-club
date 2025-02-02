@@ -1,21 +1,31 @@
 {% extends 'rankings/base.html' %}
 
 {% block content %}
-<h1 class="my-4">Leaderboard</h1>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Player</th>
-            <th>ELO Rating</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for player in players %}
-        <tr>
-            <td>{{ player.user.username }}</td>
-            <td>{{ player.elo_rating }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container">
+    <h1 class="my-4">Leaderboard</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>ELO Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in players %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <a href="{% url 'profile' player.user.username %}">{{ player.user.username }}</a>
+                </td>
+                <td>{{ player.elo_rating }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No players found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
