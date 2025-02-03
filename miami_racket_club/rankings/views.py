@@ -167,14 +167,16 @@ def profile(request, username):
 
     for match in matches:
         for set_score in match.set_scores:
-            if set_score[0] > set_score[1]:  # Player wins the set
-                sets_won += 1
-                games_won += set_score[0]  # Player wins games from set_score[0]
-                games_lost += set_score[1]  # Player loses games from set_score[1]
-            else:  # Player loses the set
-                sets_lost += 1
-                games_won += set_score[1]  # Player wins games from set_score[1]
-                games_lost += set_score[0]  # Player loses games from set_score[0]
+            if match.winner == player:  # If player won the match
+                sets_won += 1 if set_score[0] > set_score[1] else 0
+                sets_lost += 1 if set_score[0] < set_score[1] else 0
+                games_won += set_score[0]
+                games_lost += set_score[1]
+            else:  # If player lost the match
+                sets_won += 1 if set_score[1] > set_score[0] else 0
+                sets_lost += 1 if set_score[1] < set_score[0] else 0
+                games_won += set_score[1]
+                games_lost += set_score[0]
 
     game_win_percentage = (games_won / (games_won + games_lost)) * 100 if (games_won + games_lost) > 0 else 0
 
