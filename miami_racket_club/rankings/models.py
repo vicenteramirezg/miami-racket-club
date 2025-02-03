@@ -3,15 +3,16 @@ from django.contrib.auth.models import User
 import json
 
 class Player(models.Model):
-    NEIGHBORHOOD_CHOICES = [
+    NEIGHBORHOOD_CHOICES = sorted([
         ('Downtown', 'Downtown'),
         ('Doral', 'Doral'),
         ('Palmetto Bay', 'Palmetto Bay'),
         ('Brickell', 'Brickell'),
         ('Coconut Grove', 'Coconut Grove'),
         ('Coral Gables', 'Coral Gables'),
-        ('South Beach', 'South Beach'),
+        ('Miami Beach', 'Miami Beach'),
         ('Pinecrest', 'Pinecrest'),
+        ('Morningside', 'Morningside'),
         ('South Miami', 'South Miami'),
         ('Midtown', 'Midtown'),
         ('Wynwood', 'Wynwood'),
@@ -21,9 +22,8 @@ class Player(models.Model):
         ('Design District', 'Design District'),
         ('Kendall', 'Kendall'),
         ('Weston', 'Weston'),
-        ('Fort Lauderdale', 'Fort Lauderdale'),
-        ('Other', 'Other'),
-    ]
+        ('Fort Lauderdale', 'Fort Lauderdale')
+    ], key=lambda x: x[1])
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     usta_rating = models.FloatField(default=3.00)
     elo_rating = models.IntegerField(default=1000)
