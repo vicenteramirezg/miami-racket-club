@@ -3,9 +3,32 @@ from django.contrib.auth.models import User
 import json
 
 class Player(models.Model):
+    NEIGHBORHOOD_CHOICES = [
+        ('Downtown', 'Downtown'),
+        ('Doral', 'Doral'),
+        ('Palmetto Bay', 'Palmetto Bay'),
+        ('Brickell', 'Brickell'),
+        ('Coconut Grove', 'Coconut Grove'),
+        ('Coral Gables', 'Coral Gables'),
+        ('South Beach', 'South Beach'),
+        ('Pinecrest', 'Pinecrest'),
+        ('South Miami', 'South Miami'),
+        ('Midtown', 'Midtown'),
+        ('Wynwood', 'Wynwood'),
+        ('Key Biscayne', 'Key Biscayne'),
+        ('Edgewater', 'Edgewater'),
+        ('Little Havana', 'Little Havana'),
+        ('Design District', 'Design District'),
+        ('Kendall', 'Kendall'),
+        ('Weston', 'Weston'),
+        ('Fort Lauderdale', 'Fort Lauderdale'),
+        ('Other', 'Other'),
+    ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     usta_rating = models.FloatField(default=3.00)
     elo_rating = models.IntegerField(default=1000)
+    neighborhood = models.CharField(max_length=50, choices=NEIGHBORHOOD_CHOICES, default='Other')
+    phone_number = models.CharField(max_length=15, blank=True, null=True)  # US phone numbers only
 
     def __str__(self):
         return self.user.username

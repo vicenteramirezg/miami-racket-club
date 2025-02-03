@@ -10,27 +10,82 @@
                 <form method="post">
                     {% csrf_token %}
                     
-                    <!-- Form Fields -->
-                    {% for field in form %}
-                        <div class="mb-3"> <!-- Remove centering to align with label -->
-                            <label for="{{ field.id_for_label }}" class="form-label" style="color: #c8c097;">{{ field.label }}</label> <!-- Light beige label -->
-                            
-                            <!-- Add Tooltip -->
-                            {% if field.help_text %}
-                                <span class="text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="{{ field.help_text }}">
-                                    <i class="bi bi-info-circle"></i> <!-- Bootstrap info icon -->
-                                </span>
-                            {% endif %}
-                            
-                            <div class="d-flex justify-content-center"> <!-- Center the input field -->
-                                {{ field }}
-                            </div>
-                            
-                            {% for error in field.errors %}
-                                <div class="alert alert-danger">{{ error }}</div>
-                            {% endfor %}
+                    <!-- Username -->
+                    <div class="mb-3 text-center">
+                        <label for="{{ form.username.id_for_label }}" class="form-label" style="color: #c8c097;">{{ form.username.label }}</label>
+                        <div class="d-flex justify-content-center">
+                            {{ form.username }}
                         </div>
-                    {% endfor %}
+                        {% for error in form.username.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3 text-center">
+                        <label for="{{ form.email.id_for_label }}" class="form-label" style="color: #c8c097;">{{ form.email.label }}</label>
+                        <div class="d-flex justify-content-center">
+                            {{ form.email }}
+                        </div>
+                        {% for error in form.email.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Password 1 -->
+                    <div class="mb-3 text-center">
+                        <label for="{{ form.password1.id_for_label }}" class="form-label" style="color: #c8c097;">{{ form.password1.label }}</label>
+                        <div class="d-flex justify-content-center">
+                            {{ form.password1 }}
+                        </div>
+                        {% for error in form.password1.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Password 2 -->
+                    <div class="mb-3 text-center">
+                        <label for="{{ form.password2.id_for_label }}" class="form-label" style="color: #c8c097;">{{ form.password2.label }}</label>
+                        <div class="d-flex justify-content-center">
+                            {{ form.password2 }}
+                        </div>
+                        {% for error in form.password2.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- USTA Rating -->
+                    <div class="mb-3 text-center">
+                        <label for="{{ form.usta_rating.id_for_label }}" class="form-label" style="color: #c8c097;">{{ form.usta_rating.label }}</label>
+                        <div class="d-flex justify-content-center">
+                            {{ form.usta_rating }}
+                        </div>
+                        {% for error in form.usta_rating.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Neighborhood Dropdown -->
+                    <div class="mb-3 text-center">
+                        <label for="{{ form.neighborhood.id_for_label }}" class="form-label" style="color: #c8c097;">{{ form.neighborhood.label }}</label>
+                        <div class="d-flex justify-content-center">
+                            {{ form.neighborhood }}
+                        </div>
+                        {% for error in form.neighborhood.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Phone Number with Auto-Formatting -->
+                    <div class="mb-3 text-center">
+                        <label for="{{ form.phone_number.id_for_label }}" class="form-label" style="color: #c8c097;">{{ form.phone_number.label }}</label>
+                        <div class="d-flex justify-content-center">
+                            {{ form.phone_number }}
+                        </div>
+                        {% for error in form.phone_number.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
                     
                     <!-- Sign Up Button -->
                     <div class="text-center">
@@ -46,4 +101,29 @@
         </div>
     </div>
 </div>
+
+<!-- JavaScript for Auto-Formatting Phone Number -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let phoneInput = document.getElementById("{{ form.phone_number.id_for_label }}");
+    
+    phoneInput.addEventListener("input", function(event) {
+        let value = phoneInput.value.replace(/\D/g, ''); // Remove non-numeric characters
+        if (value.length > 10) {
+            value = value.substring(0, 10);
+        }
+        
+        let formatted = "";
+        if (value.length > 6) {
+            formatted = `(${value.substring(0,3)}) ${value.substring(3,6)}-${value.substring(6,10)}`;
+        } else if (value.length > 3) {
+            formatted = `(${value.substring(0,3)}) ${value.substring(3,6)}`;
+        } else if (value.length > 0) {
+            formatted = `(${value}`;
+        }
+
+        phoneInput.value = formatted;
+    });
+});
+</script>
 {% endblock %}

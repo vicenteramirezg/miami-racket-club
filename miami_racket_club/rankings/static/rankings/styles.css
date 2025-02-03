@@ -168,3 +168,42 @@ a:hover {
         padding: 10px 15px; /* Adjust padding for better spacing */
     }
 }
+
+/* Styling for the Leaderboard Table */
+.leaderboard-page table {
+    background-color: #4c7563; /* Light green background for the entire table */
+    border-radius: 8px; /* Optional: Add rounded corners */
+    overflow: hidden; /* Ensure corners are rounded */
+}
+
+/* Table header styles for leaderboard */
+.leaderboard-page table thead {
+    background-color: #c8c097; /* Light beige for the header */
+    color: #104730; /* Dark green text for contrast */
+}
+
+.leaderboard-page table thead th {
+    font-weight: 600; /* Make the header text bold */
+    padding: 12px; /* Add padding to the header cells */
+}
+
+/* Table body styles for leaderboard */
+.leaderboard-page table tbody {
+    background-color: #ffffff; /* White background for the body */
+}
+
+.leaderboard-page table tbody td {
+    padding: 10px; /* Add padding to the table cells */
+    color: #495057; /* Default dark gray color for text */
+}
+
+/* Optional: Add alternating row colors for better readability */
+.leaderboard-page table tbody tr:nth-child(even) {
+    background-color: #f7f7f7; /* Light gray background for even rows */
+}
+
+/* Table row hover effect */
+.leaderboard-page table tbody tr:hover {
+    background-color: #e6f0e2; /* Slight light green on hover */
+}
+

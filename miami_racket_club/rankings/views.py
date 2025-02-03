@@ -205,7 +205,12 @@ class SignUpView(CreateView):
         usta_rating = form.cleaned_data.get('usta_rating')
 
         # Save USTA Rating in Player model
-        Player.objects.create(user=user, usta_rating=float(usta_rating))
+        Player.objects.create(
+            user=user,
+            usta_rating=form.cleaned_data['usta_rating'],
+            neighborhood=form.cleaned_data['neighborhood'],
+            phone_number=form.cleaned_data['phone_number']
+        )
 
         login(self.request, user)
         return redirect(self.success_url)

@@ -3,13 +3,13 @@
 {% block content %}
 <div class="leaderboard-page">
     <div class="container">
-        <h1 class="my-4 text-center">Leaderboard</h1>  <!-- Added text-center to center the title -->
+        <h1 class="my-4 text-center" style="color: #c8c097;">Leaderboard</h1>  <!-- Light beige title -->
 
         <!-- Table Container with Rounded Edges and Narrower Width -->
-        <div class="border p-4 rounded" style="max-width: 800px; margin: 0 auto; background-color: transparent;">
+        <div class="border p-4 rounded" style="max-width: 800px; margin: 0 auto; background-color: #4c7563; border-color: #c8c097;"> <!-- Light green background, beige border -->
             <table class="table table-striped table-bordered">
                 <thead>
-                    <tr>
+                    <tr style="background-color: #c8c097; color: #104730;"> <!-- Light beige header with dark green text -->
                         <th>Rank</th>
                         <th>Player</th>
                         <th>ELO Rating</th>
@@ -20,13 +20,13 @@
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td>
-                            <a href="{% url 'profile' player.user.username %}" class="text-decoration-none">{{ player.user.username }}</a>
+                            <a href="{% url 'profile' player.user.username %}" class="text-decoration-none" style="color: #104730;">{{ player.user.username }}</a>
                         </td>
                         <td>{{ player.elo_rating }}</td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="3">No players found.</td>
+                        <td colspan="3" style="color: #104730;">No players found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
