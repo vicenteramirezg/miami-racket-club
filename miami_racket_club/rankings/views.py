@@ -33,21 +33,115 @@ def send_match_notification(match):
     from_email = formataddr(("🎾 Miami Racket Club", settings.DEFAULT_FROM_EMAIL))
     subject = Header("New Match Submitted!", "utf-8").encode()
     
-    # Loop through each player and send an individual email
+    # Hosted/static image URL (update if necessary)
+    logo_url = "https://themiamiracketclub.com/static/rankings/logo.png"
+
+    # Font URL (import Google Font)
+    font_url = "https://fonts.googleapis.com/css2?family=Alegreya:wght@400;700&display=swap"
+
     for player in [match.winner, match.loser]:
-        message = f'''
+        opponent = match.loser.user.username if player == match.winner else match.winner.user.username
+        result = "✅ Win" if player == match.winner else "❌ Lose"
+
+        # Plain text version (fallback)
+        plain_message = f'''
         🎉 A new match has been submitted!
 
-        - 🆚 Opponent: {match.loser.user.username if player == match.winner else match.winner.user.username}
-        - 🏆 Result: {"✅ Win" if player == match.winner else "❌ Lose"}
+        - 🏆 Result: {result}
+        - 🆚 Opponent: {opponent}
         - 📊 Score: {match.set_scores}
         - 📅 Date: {match.date}
         - 📝 Notes: {match.notes}
 
-        Keep playing and improving! 🚀🔥
+        See you on court!
         '''
+
+        # HTML version with logo and styles
+        html_message = f'''
+        <html>
+        <head>
+            <style>
+                /* Import Alegreya font */
+                @import url('{font_url}');
+
+                /* Apply custom styles */
+                body {{
+                    font-family: 'Alegreya', serif;
+                    color: #104730; /* Dark green text */
+                    background-color: #ffffff; /* White background */
+                    margin: 0;
+                    padding: 20px;
+                }}
+
+                .email-container {{
+                    max-width: 500px;
+                    margin: auto;
+                    padding: 20px;
+                    border: 1px solid #ddd;
+                    border-radius: 10px;
+                    background-color: #f9f9f9;
+                }}
+
+                .email-header {{
+                    text-align: center;
+                }}
+
+                .email-header img {{
+                    max-width: 150px;
+                    margin-bottom: 10px;
+                }}
+
+                .email-content {{
+                    text-align: center;
+                }}
+
+                h3 {{
+                    color: #104730; /* Dark green for the header */
+                }}
+
+                p {{
+                    font-size: 16px;
+                    margin: 10px 0;
+                }}
+
+                .footer {{
+                    margin-top: 20px;
+                    text-align: center;
+                    font-size: 14px;
+                }}
+
+                a {{
+                    color: #104730;
+                    text-decoration: none;
+                }}
+                a:hover {{
+                    text-decoration: underline;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <div class="email-header">
+                    <img src="{logo_url}" alt="Miami Racket Club Logo">
+                </div>
+                <div class="email-content">
+                    <h3>New Match Submitted! 🎉</h3>
+                    <p><strong>🏆 Result:</strong> {result}</p>
+                    <p><strong>🆚 Opponent:</strong> {opponent}</p>
+                    <p><strong>📊 Score:</strong> {match.set_scores}</p>
+                    <p><strong>📅 Date:</strong> {match.date}</p>
+                    <p><strong>📝 Notes:</strong> {match.notes}</p>
+                </div>
+                <div class="footer">
+                    <p>See you on court!</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        '''
+        
         recipient_list = [player.user.email]
-        send_mail(subject, message, from_email, recipient_list)
+        send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
 
 def home(request):
     recent_matches = Match.objects.order_by('-date')[:5]  # Get the 5 most recent matches
