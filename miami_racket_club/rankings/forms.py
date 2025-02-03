@@ -49,7 +49,7 @@ class CustomSignUpForm(UserCreationForm):
 
     neighborhood = forms.ChoiceField(choices=Player.NEIGHBORHOOD_CHOICES, label="Neighborhood")
 
-    phone_number = forms.CharField(max_length=15, label="Phone Number (US only)", required=False)
+    phone_number = forms.CharField(max_length=15, label="Phone Number", required=False)
 
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
