@@ -125,7 +125,7 @@ def send_match_notification(match):
                     <img src="{logo_url}" alt="Miami Racket Club Logo">
                 </div>
                 <div class="email-content">
-                    <h3>New Match Submitted! 🎉</h3>
+                    <h3>New Match Submitted</h3>
                     <p><strong>🏆 Result:</strong> {result}</p>
                     <p><strong>🆚 Opponent:</strong> {opponent}</p>
                     <p><strong>📊 Score:</strong> {match.set_scores}</p>

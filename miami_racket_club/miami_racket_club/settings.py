@@ -29,6 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',  # Localhost
     '10.0.0.245',  # Your Mac's local IP
+    '10.1.60.107' # Windows host
 ]
 
 LOGIN_REDIRECT_URL = 'home'  # Redirect to the homepage after login

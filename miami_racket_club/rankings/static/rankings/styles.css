@@ -100,3 +100,71 @@ a:hover {
     color: #c8c097; /* Light beige on hover */
     text-decoration: underline; /* Add underline on hover */
 }
+
+/* Style for the Navbar (already in base.html) */
+.navbar-nav {
+    display: flex;
+    gap: 20px;
+}
+
+.navbar-nav a {
+    color: #c8c097;
+}
+
+.navbar-nav .nav-link {
+    padding: 10px;
+}
+
+.navbar-nav .navbar-toggler {
+    border: none;
+    background-color: transparent;
+}
+
+/* Style for the mobile Hamburger Menu */
+@media screen and (max-width: 768px) {
+    /* Background color for the expanded menu */
+    .navbar-collapse {
+        background-color: #4c7563 !important; /* Light green background */
+        padding: 10px 20px; /* Add some padding for better spacing */
+        border-radius: 5px; /* Optional: Add rounded corners */
+        margin-top: 10px; /* Add some space between the hamburger icon and the menu */
+    }
+
+    /* Text color for the menu items */
+    .navbar-nav .nav-link {
+        color: #c8c097 !important; /* Light beige text */
+        padding: 10px 0; /* Add padding to each link for better spacing */
+    }
+
+    /* Hover effect for the menu items */
+    .navbar-nav .nav-link:hover {
+        color: #ffffff !important; /* White text on hover */
+    }
+
+    /* Style the logout button to match the menu */
+    .navbar-nav .btn-link {
+        color: #c8c097 !important; /* Light beige text */
+        padding: 10px 0; /* Match padding with other links */
+        text-align: left; /* Align text to the left */
+    }
+
+    .navbar-nav .btn-link:hover {
+        color: #ffffff !important; /* White text on hover */
+    }
+}
+
+/* Customize the hamburger icon color */
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='%23c8c097' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Desktop Navbar - Align the navbar items to the right */
+@media screen and (min-width: 768px) {
+    .navbar-nav {
+        margin-left: auto; /* This pushes the navbar links to the right */
+    }
+
+    .navbar-nav .nav-link {
+        padding: 10px 15px; /* Adjust padding for better spacing */
+    }
+}
