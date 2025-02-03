@@ -74,8 +74,18 @@ class Match(models.Model):
         # Update player ratings
         self.winner.elo_rating = new_winner_rating
         self.loser.elo_rating = new_loser_rating
-        self.winner.save()
-        self.loser.save()
+
+        # Log ELO changes
+        ELOHistory.objects.create(player=self.winner, elo_rating=new_winner_rating)
+        ELOHistory.objects.create(player=self.loser, elo_rating=new_loser_rating)
 
         # Save the match
         super().save(*args, **kwargs)
+
+class ELOHistory(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history')
+    elo_rating = models.IntegerField()
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.player.user.username} - {self.elo_rating} on {self.date}"

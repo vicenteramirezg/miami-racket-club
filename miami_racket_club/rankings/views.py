@@ -159,7 +159,6 @@ def profile(request, username):
     matches_played = matches.count()
     matches_won = matches.filter(winner=player).count()
     matches_lost = matches_played - matches_won
-    match_win_percentage = (matches_won / matches_played) * 100 if matches_played > 0 else 0
 
     sets_won = 0
     sets_lost = 0
@@ -168,19 +167,19 @@ def profile(request, username):
 
     for match in matches:
         for set_score in match.set_scores:
-            # Count sets won/lost for the player in each set (independent of match result)
-            if set_score[0] > set_score[1]:  # player wins the set
+            if set_score[0] > set_score[1]:  # Player wins the set
                 sets_won += 1
-            else:  # opponent wins the set
+                games_won += set_score[0]  # Player wins games from set_score[0]
+                games_lost += set_score[1]  # Player loses games from set_score[1]
+            else:  # Player loses the set
                 sets_lost += 1
+                games_won += set_score[1]  # Player wins games from set_score[1]
+                games_lost += set_score[0]  # Player loses games from set_score[0]
 
-            # Count games won and lost in each set
-            games_won += set_score[0]
-            games_lost += set_score[1]
-
-    # Calculate win percentages
     game_win_percentage = (games_won / (games_won + games_lost)) * 100 if (games_won + games_lost) > 0 else 0
-    set_win_percentage = (sets_won / (sets_won + sets_lost)) * 100 if (sets_won + sets_lost) > 0 else 0
+
+    # Get ELO history
+    elo_history = player.elo_history.order_by('date')
 
     context = {
         'player': player,
@@ -188,13 +187,12 @@ def profile(request, username):
         'matches_played': matches_played,
         'matches_won': matches_won,
         'matches_lost': matches_lost,
-        'match_win_percentage': round(match_win_percentage, 1),
         'sets_won': sets_won,
         'sets_lost': sets_lost,
         'games_won': games_won,
         'games_lost': games_lost,
-        'game_win_percentage': round(game_win_percentage, 1),
-        'set_win_percentage': round(set_win_percentage, 1),  # Add set win percentage
+        'game_win_percentage': round(game_win_percentage, 2),
+        'elo_history': elo_history,  # Pass ELO history to the template
     }
 
     return render(request, 'rankings/profile.html', context)

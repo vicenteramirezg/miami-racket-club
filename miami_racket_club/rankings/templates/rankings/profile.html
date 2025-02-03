@@ -40,6 +40,33 @@
         </div>
     </div>
 
+    <!-- ELO History Section -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">ELO Rating History</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>ELO Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in elo_history %}
+                    <tr>
+                        <td>{{ entry.date|date:"Y-m-d H:i" }}</td>
+                        <td>{{ entry.elo_rating }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">No ELO history found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Match History -->
     <div class="card">
         <div class="card-body">
