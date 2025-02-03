@@ -2,76 +2,70 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="my-4">Submit Match</h1>
-    <div class="card">
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
+    <h1 class="my-4 text-center">Submit Match</h1>
+    
+    <form method="post">
+        {% csrf_token %}
 
-                <!-- Winner Section -->
-                <div class="row mb-3 align-items-center">
-                    <div class="col-md-3">
-                        <label for="{{ form.winner.id_for_label }}">Winner</label>
-                        {{ form.winner }}
+        <!-- Scoreboard & Match Details -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8"> 
+                <div class="border p-4 rounded" style="border-color: #c8c097; background-color: transparent;">
+                    <div class="text-center fw-bold mb-3" style="color: #104730;">Match Score</div>
+                    
+                    <!-- Scoreboard Header -->
+                    <div class="row text-center fw-bold mb-2">
+                        <div class="col-3">Player</div>
+                        <div class="col-3">Set 1</div>
+                        <div class="col-3">Set 2</div>
+                        <div class="col-3">Set 3</div>
                     </div>
-                    <div class="col-md-3">
-                        <label for="{{ form.winner_games_set1.id_for_label }}">Set 1 Games</label>
-                        {{ form.winner_games_set1 }}
+
+                    <!-- Winner Row -->
+                    <div class="row text-center align-items-center mb-2">
+                        <div class="col-3 d-flex flex-column align-items-center">
+                            <span class="badge bg-success mb-1">Winner</span>
+                            {{ form.winner }}
+                        </div>
+                        <div class="col-3">{{ form.winner_games_set1 }}</div>
+                        <div class="col-3">{{ form.winner_games_set2 }}</div>
+                        <div class="col-3">{{ form.winner_games_set3 }}</div>
                     </div>
-                    <div class="col-md-3">
-                        <label for="{{ form.winner_games_set2.id_for_label }}">Set 2 Games</label>
-                        {{ form.winner_games_set2 }}
+
+                    <hr class="my-2">
+
+                    <!-- Loser Row -->
+                    <div class="row text-center align-items-center mb-3">
+                        <div class="col-3 d-flex flex-column align-items-center">
+                            <span class="badge bg-danger mb-1">Loser</span>
+                            {{ form.loser }}
+                        </div>
+                        <div class="col-3">{{ form.loser_games_set1 }}</div>
+                        <div class="col-3">{{ form.loser_games_set2 }}</div>
+                        <div class="col-3">{{ form.loser_games_set3 }}</div>
                     </div>
-                    <div class="col-md-3">
-                        <label for="{{ form.winner_games_set3.id_for_label }}">Set 3 Games</label>
-                        {{ form.winner_games_set3 }}
+
+                    <hr class="my-3">
+
+                    <!-- Date & Notes Inside Border -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="{{ form.date.id_for_label }}" class="form-label">Match Date</label>
+                            {{ form.date }}
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+
+                    <!-- Submit Button Inside the Bordered Container -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Submit Match</button>
                     </div>
                 </div>
-
-                <!-- Loser Section -->
-                <div class="row mb-3 align-items-center">
-                    <div class="col-md-3">
-                        <label for="{{ form.loser.id_for_label }}">Loser</label>
-                        {{ form.loser }}
-                    </div>
-                    <div class="col-md-3">
-                        <label for="{{ form.loser_games_set1.id_for_label }}">Set 1 Games</label>
-                        {{ form.loser_games_set1 }}
-                    </div>
-                    <div class="col-md-3">
-                        <label for="{{ form.loser_games_set2.id_for_label }}">Set 2 Games</label>
-                        {{ form.loser_games_set2 }}
-                    </div>
-                    <div class="col-md-3">
-                        <label for="{{ form.loser_games_set3.id_for_label }}">Set 3 Games</label>
-                        {{ form.loser_games_set3 }}
-                    </div>
-                </div>
-
-                <!-- Date Picker -->
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="{{ form.date.id_for_label }}">Match Date</label>
-                        {{ form.date }}
-                    </div>
-                </div>
-
-                <!-- Notes Section -->
-                <div class="row mb-3">
-                    <div class="col-md-12">
-                        <label for="{{ form.notes.id_for_label }}">Notes</label>
-                        {{ form.notes }}
-                    </div>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="row">
-                    <div class="col-md-12">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
 {% endblock %}

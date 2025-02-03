@@ -11,7 +11,13 @@ class MatchForm(forms.ModelForm):
     loser_games_set2 = forms.IntegerField(label='Set 2 Games (Loser)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
     winner_games_set3 = forms.IntegerField(label='Set 3 Games (Winner)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
     loser_games_set3 = forms.IntegerField(label='Set 3 Games (Loser)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    date = forms.DateField(label='Match Date', widget=DateInput(attrs={'type': 'date', 'class': 'form-control'}))
+    
+    # Update the date field to use the mm-dd-yyyy format
+    date = forms.DateField(
+        label='Match Date',
+        widget=DateInput(attrs={'type': 'date', 'class': 'form-control'}, format='%m-%d-%Y')
+    )
+    
     notes = forms.CharField(label='Notes', widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), required=False)
 
     class Meta:
