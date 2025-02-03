@@ -15,22 +15,88 @@
 
 /* Style links globally */
 a {
-    color: #c8c097; /* Black text */
+    color: #c8c097; /* Light beige text */
     text-decoration: none; /* Remove underline */
 }
 
 a:hover {
-    color: #ffffff; /* Light beige on hover */
+    color: #ffffff; /* White on hover */
     text-decoration: underline; /* Add underline on hover */
 }
 
 /* Style player name links only on the leaderboard page */
-.leaderboard-page a {
+.leaderboard-page table a {
     color: #000000; /* Black text */
     text-decoration: none; /* Remove underline */
 }
 
-.leaderboard-page a:hover {
+.leaderboard-page table a:hover {
+    color: #c8c097; /* Light beige on hover */
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* Tooltip styling */
+[data-bs-toggle="tooltip"] {
+    cursor: pointer;
+}
+
+.bi-info-circle {
+    margin-left: 10px;
+    font-size: 1.2rem;
+    color: #c8c097;
+}
+
+/* Optional: Add a slight hover effect to tooltips */
+[data-bs-toggle="tooltip"]:hover {
+    color: #104730;
+}
+
+/* Additional custom styles for the form */
+.form-label {
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: #c8c097;
+    border-color: #c8c097;
+    color: #104730;
+}
+
+.btn-primary:hover {
+    background-color: #ffffff;
+    color: #104730;
+    border-color: #c8c097;
+}
+
+/* For the form error messages */
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.home-title {
+    color: #c8c097;
+}
+
+.home-link {
+    color: #c8c097;
+}
+
+.home-link:hover {
+    color: #104730;
+    text-decoration: underline;
+}
+
+/* Styling for Winner and Loser profile links inside Recent Matches table */
+.table a {
+    color: #000000; /* Black text */
+    text-decoration: none; /* Remove underline */
+}
+
+.table a:hover {
     color: #c8c097; /* Light beige on hover */
     text-decoration: underline; /* Add underline on hover */
 }

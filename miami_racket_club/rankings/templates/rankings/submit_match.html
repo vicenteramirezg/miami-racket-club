@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="my-4 text-center">Submit Match</h1>
+    <h1 class="my-4 text-center" style="color: #c8c097;">Submit Match</h1> <!-- Light beige title -->
     
     <form method="post">
         {% csrf_token %}
@@ -10,11 +10,11 @@
         <!-- Scoreboard & Match Details -->
         <div class="row justify-content-center">
             <div class="col-lg-8"> 
-                <div class="border p-4 rounded" style="border-color: #c8c097; background-color: transparent;">
-                    <div class="text-center fw-bold mb-3" style="color: #104730;">Match Score</div>
+                <div class="border p-4 rounded" style="border-color: #c8c097; background-color: #ffffff;"> <!-- White background -->
+                    <div class="text-center fw-bold mb-3" style="color: #c8c097;">Match Score</div> <!-- Light beige title -->
                     
                     <!-- Scoreboard Header -->
-                    <div class="row text-center fw-bold mb-2">
+                    <div class="row text-center fw-bold mb-2" style="color: #c8c097;"> <!-- Light beige text -->
                         <div class="col-3">Player</div>
                         <div class="col-3">Set 1</div>
                         <div class="col-3">Set 2</div>
@@ -50,18 +50,18 @@
                     <!-- Date & Notes Inside Border -->
                     <div class="row">
                         <div class="col-md-6">
-                            <label for="{{ form.date.id_for_label }}" class="form-label">Match Date</label>
+                            <label for="{{ form.date.id_for_label }}" class="form-label" style="color: #c8c097;">Match Date</label> <!-- Light beige text -->
                             {{ form.date }}
                         </div>
                         <div class="col-md-12 mt-3">
-                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                            <label for="{{ form.notes.id_for_label }}" class="form-label" style="color: #c8c097;">Notes</label> <!-- Light beige text -->
                             {{ form.notes }}
                         </div>
                     </div>
 
                     <!-- Submit Button Inside the Bordered Container -->
                     <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg">Submit Match</button>
+                        <button type="submit" class="btn btn-primary btn-lg" style="background-color: #c8c097; border-color: #c8c097; color: #104730;">Submit Match</button> <!-- Custom button style -->
                     </div>
                 </div>
             </div>

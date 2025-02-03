@@ -7,6 +7,8 @@
     <title>Miami Racket Club</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons (for tooltips and icons) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Alegreya Font -->
     <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;700&display=swap" rel="stylesheet">
     <!-- Custom Styles -->
@@ -16,6 +18,13 @@
             font-family: 'Alegreya', serif;
             background-color: #104730; /* Dark green background */
             color: #ffffff; /* White body text */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Full viewport height */
+        }
+
+        .content-wrapper {
+            flex: 1; /* Take up all remaining space */
         }
 
         /* Titles and subtitles */
@@ -85,6 +94,7 @@
             color: #c8c097; /* Light beige text */
             padding: 20px 0;
             text-align: center;
+            margin-top: auto; /* Push footer to bottom */
         }
 
         .footer a {
@@ -136,7 +146,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container mt-4">
+    <div class="container mt-4 content-wrapper">
         {% block content %}
         {% endblock %}
     </div>
@@ -151,5 +161,15 @@
 
     <!-- Bootstrap JS (optional) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Initialize tooltips (only once) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
 </body>
 </html>

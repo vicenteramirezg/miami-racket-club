@@ -1,13 +1,67 @@
 {% extends 'rankings/base.html' %}
 
 {% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8"> <!-- Narrower width for the content -->
+            <div class="home-container">
+                <h1 class="my-4 text-center home-title">Welcome to Miami Racket Club</h1>
+                <p class="text-center home-text">Track your matches and see the leaderboard!</p>
+                {% if user.is_authenticated %}
+                    <div class="text-center">
+                        <p class="home-text">
+                            <a href="{% url 'submit_match' %}" class="home-link">Submit a match</a>
+                        </p>
+                        <p class="home-text">
+                            <a href="{% url 'leaderboard' %}" class="home-link">View the leaderboard</a>
+                        </p>
+                    </div>
 
-<h1 class="my-4">Welcome to Miami Racket Club</h1>
-<p>Track your matches and see the leaderboard!</p>
-{% if user.is_authenticated %}
-    <p><a href="{% url 'submit_match' %}">Submit a match</a></p>
-    <p><a href="{% url 'leaderboard' %}">View the leaderboard</a></p>
-{% else %}
-    <p>Please <a href="{% url 'login' %}">log in</a> to submit matches or view the leaderboard.</p>
-{% endif %}
+                    <!-- Recent Matches Section (only visible if logged in) -->
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2 class="card-title text-center">Recent Matches</h2>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Winner</th>
+                                                <th>Loser</th>
+                                                <th>Score</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for match in recent_matches %}
+                                            <tr>
+                                                <td>{{ match.date|date:"Y-m-d" }}</td>
+                                                <td>
+                                                    <a href="{% url 'profile' match.winner.user.username %}">{{ match.winner.user.username }}</a>
+                                                </td>
+                                                <td>
+                                                    <a href="{% url 'profile' match.loser.user.username %}">{{ match.loser.user.username }}</a>
+                                                </td>
+                                                <td>{{ match.set_scores }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="4">No recent matches found.</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-center home-text">
+                        Please <a href="{% url 'login' %}" class="home-link">log in</a> to submit matches or view the leaderboard.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

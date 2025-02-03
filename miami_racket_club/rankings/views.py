@@ -50,7 +50,11 @@ def send_match_notification(match):
         send_mail(subject, message, from_email, recipient_list)
 
 def home(request):
-    return render(request, 'rankings/home.html')
+    recent_matches = Match.objects.order_by('-date')[:5]  # Get the 5 most recent matches
+    context = {
+        'recent_matches': recent_matches,
+    }
+    return render(request, 'rankings/home.html', context)
 
 def profile(request, username):
     player = get_object_or_404(Player, user__username=username)

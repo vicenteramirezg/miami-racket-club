@@ -50,6 +50,16 @@ class CustomSignUpForm(UserCreationForm):
 
     usta_rating = forms.ChoiceField(choices=USTA_RATING_CHOICES, required=True, label="USTA Rating")
 
+    # Custom help text for the password fields
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(),
+        help_text="Your password must be at least 8 characters long, contain both letters and numbers, and have at least one special character."
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(),
+        help_text="Enter the same password again for confirmation."
+    )
+
     class Meta:
         model = User
         fields = ('username', 'email', 'password1', 'password2')
