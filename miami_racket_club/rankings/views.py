@@ -190,6 +190,25 @@ def profile(request, username):
     # Get ELO history
     elo_history = player.elo_history.order_by('date')
 
+    # Calculate Current Streak (most recent wins until a loss)
+    current_streak = 0
+    for match in matches:
+        if match.winner == player:
+            current_streak += 1
+        else:
+            break  # Stop when the first loss is encountered
+
+    # Calculate Longest Streak Ever (longest sequence of wins in history)
+    longest_streak = 0
+    current_streak_temp = 0
+    for match in matches:
+        if match.winner == player:
+            current_streak_temp += 1
+        else:
+            longest_streak = max(longest_streak, current_streak_temp)
+            current_streak_temp = 0  # Reset streak after a loss
+    longest_streak = max(longest_streak, current_streak_temp)  # Check in case the longest streak ends with wins
+
     context = {
         'player': player,
         'matches': matches,
@@ -206,6 +225,8 @@ def profile(request, username):
         'set_win_percentage': round(set_win_percentage, 1),
         'game_win_percentage': round(game_win_percentage, 1),
         'elo_history': elo_history,  # Pass ELO history to the template
+        'current_streak': current_streak,  # Add current streak to context
+        'longest_streak': longest_streak  # Add longest streak to context
     }
 
     return render(request, 'rankings/profile.html', context)

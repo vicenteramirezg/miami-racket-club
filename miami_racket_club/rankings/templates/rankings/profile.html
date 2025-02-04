@@ -144,7 +144,7 @@
         // Extract ELO history data from Django context
         const eloHistory = [
             {% for entry in elo_history %}
-                { date: "{{ entry.date|date:'Y-m-d' }}", elo: {{ entry.elo_rating }} },
+                { date: "{{ entry.date|date:'Y-m-d'|escapejs }}", elo: {{ entry.elo_rating|escapejs }} },
             {% endfor %}
         ];
 
