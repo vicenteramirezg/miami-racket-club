@@ -207,3 +207,43 @@ a:hover {
     background-color: #e6f0e2; /* Slight light green on hover */
 }
 
+/* Custom styles for the big stats cards */
+.stats-card {
+    background-color: #ffffff; /* White background */
+    border: 1px solid #e0e0e0; /* Light border */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+.stats-card:hover {
+    transform: translateY(-5px); /* Slight lift on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+.stats-card .card-title {
+    font-size: 1.25rem; /* Larger title */
+    color: #104730; /* Dark green text */
+    margin-bottom: 1rem; /* Spacing below the title */
+}
+
+.stats-card .display-4 {
+    font-weight: 700; /* Bold big numbers */
+    color: #104730; /* Dark green text */
+    margin-bottom: 0.5rem; /* Spacing below the big number */
+}
+
+.stats-card .card-text {
+    font-size: 0.9rem; /* Smaller text for details */
+    color: #6c757d; /* Gray text for contrast */
+}
+
+/* Optional: Add a gradient background for a modern look */
+.stats-card.gradient-bg {
+    background: linear-gradient(135deg, #c8c097, #ffffff); /* Light beige to white gradient */
+}
+
+/* Optional: Add a border accent for a pop of color */
+.stats-card.border-accent {
+    border-top: 4px solid #104730; /* Dark green accent border */
+}

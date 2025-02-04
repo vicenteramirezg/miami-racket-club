@@ -2,97 +2,135 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="my-4 text-center">{{ player.user.username }}'s Profile</h1>
-
-    <div class="row">
-        <!-- Player Details -->
-        <div class="col-md-6">
-            <div class="card mb-4">
+    <h1 class="my-4 text-center" style="color: #c8c097;">{{ player.user.username }}'s Profile</h1>  <!-- Light beige title -->
+    <!-- Player Information (Centered at the Top) -->
+    <div class="row justify-content-center mb-4">  <!-- Added mb-4 class for margin-bottom -->
+        <div class="col-md-8 text-center">
+            <div class="border p-4 rounded" style="background-color: #4c7563; border-color: #c8c097;">
                 <div class="card-body">
-                    <h5 class="card-title">Player Information</h5>
                     <p class="card-text">
-                        <strong>Name:</strong> {{ player.user.username }}<br>
-                        <strong>USTA Rating:</strong> {{ player.usta_rating }}<br>
-                        <strong>ELO Rating:</strong> {{ player.elo_rating }}
+                        <strong class="light-beige">Name:</strong> {{ player.user.username }}<br>
+                        <strong class="light-beige">Phone number:</strong> 
+                        <a href="tel:+{{ player.phone_number|slice:":3" }}{{ player.phone_number|slice:"3:6" }}{{ player.phone_number|slice:"6" }}" 
+                           style="color: #c8c097; text-decoration: none;"> 
+                            ({{ player.phone_number|slice:":3" }}) {{ player.phone_number|slice:"3:6" }}-{{ player.phone_number|slice:"6" }}
+                        </a><br>
+                        <strong class="light-beige">Neighborhood:</strong> {{ player.neighborhood }}<br>
+                        <strong class="light-beige">USTA Rating:</strong> {{ player.usta_rating }}<br>
+                        <strong class="light-beige">ELO Rating:</strong> {{ player.elo_rating }}
                     </p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Player Statistics -->
-        <div class="col-md-6">
-            <div class="card mb-4">
+    <!-- Big Stats Cards (Single Horizontal Line) -->
+    <div class="row justify-content-center">
+        <!-- Match Win Percentage -->
+        <div class="col-md-3">
+            <div class="card mb-4 text-center stats-card">
                 <div class="card-body">
-                    <h5 class="card-title">Player Statistics</h5>
-                    <p class="card-text">
-                        <strong>Matches Played:</strong> {{ matches_played }}<br>
-                        <strong>Matches Won:</strong> {{ matches_won }}<br>
-                        <strong>Matches Lost:</strong> {{ matches_lost }}<br>
-                        <strong>Match Win Percentage:</strong> {{ match_win_percentage }}%<br>
-                        <strong>Sets Won:</strong> {{ sets_won }}<br>
-                        <strong>Sets Lost:</strong> {{ sets_lost }}<br>
-                        <strong>Games Won:</strong> {{ games_won }}<br>
-                        <strong>Games Lost:</strong> {{ games_lost }}<br>
-                        <strong>Game Win Percentage:</strong> {{ game_win_percentage }}%<br>
-                    </p>
+                    <h5 class="card-title">Match Win Percentage</h5>
+                    <h3 class="display-4 text-success">{{ match_win_percentage }}%</h3>
+                    <p class="card-text">Total Matches Played: {{ matches_played }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Set Win Percentage -->
+        <div class="col-md-3">
+            <div class="card mb-4 text-center stats-card">
+                <div class="card-body">
+                    <h5 class="card-title">Set Win Percentage</h5>
+                    <h3 class="display-4 text-success">{{ set_win_percentage }}%</h3>
+                    <p class="card-text">Total Sets Played: {{ sets_played }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Win Percentage -->
+        <div class="col-md-3">
+            <div class="card mb-4 text-center stats-card">
+                <div class="card-body">
+                    <h5 class="card-title">Game Win Percentage</h5>
+                    <h3 class="display-4 text-success">{{ game_win_percentage }}%</h3>
+                    <p class="card-text">Total Games Played: {{ games_played }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Streak -->
+        <div class="col-md-3">
+            <div class="card mb-4 text-center stats-card">
+                <div class="card-body">
+                    <h5 class="card-title">Current Streak</h5>
+                    <h3 class="display-4 text-success">{{ current_streak }}</h3>
+                    <p class="card-text">Longest Streak: {{ longest_streak }}</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ELO History Chart -->
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">ELO Rating History</h5>
-            <div style="height: 200px;">  <!-- Fixed height container -->
-                <canvas id="eloChart"></canvas>
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">ELO Rating History</h5>
+                    <div style="height: 200px;">  <!-- Fixed height container -->
+                        <canvas id="eloChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-
     <!-- Match History -->
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">Match History</h5>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Opponent</th>
-                        <th>Result</th>
-                        <th>Score</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for match in matches %}
-                    <tr>
-                        <td>{{ match.date|date:"Y-m-d" }}</td>
-                        <td>
-                            {% if match.winner == player %}
-                                {{ match.loser.user.username }}
-                            {% else %}
-                                {{ match.winner.user.username }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if match.winner == player %}
-                                <span class="text-success">Win</span>
-                            {% else %}
-                                <span class="text-danger">Loss</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ match.set_scores }}</td>
-                        <td>{{ match.notes|default:"-" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5">No matches found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Match History</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Opponent</th>
+                                <th>Result</th>
+                                <th>Score</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for match in matches %}
+                            <tr>
+                                <td>{{ match.date|date:"Y-m-d" }}</td>
+                                <td>
+                                    {% if match.winner == player %}
+                                        {{ match.loser.user.username }}
+                                    {% else %}
+                                        {{ match.winner.user.username }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if match.winner == player %}
+                                        <span class="text-success">Win</span>
+                                    {% else %}
+                                        <span class="text-danger">Loss</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ match.set_scores }}</td>
+                                <td>{{ match.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5">No matches found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -110,9 +148,23 @@
             {% endfor %}
         ];
 
+        // Create an object to store the latest ELO rating per date
+        const latestEloPerDay = {};
+
+        eloHistory.forEach(entry => {
+            // If the date does not exist in the object or the current entry has a later ELO rating, update it
+            if (!latestEloPerDay[entry.date] || latestEloPerDay[entry.date].elo < entry.elo) {
+                latestEloPerDay[entry.date] = entry;
+            }
+        });
+
+        // Convert the object back to an array and sort by date
+        const filteredEloHistory = Object.values(latestEloPerDay)
+            .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
+
         // Prepare data for Chart.js
-        const labels = eloHistory.map(entry => entry.date);
-        const data = eloHistory.map(entry => entry.elo);
+        const labels = filteredEloHistory.map(entry => entry.date);
+        const data = filteredEloHistory.map(entry => entry.elo);
 
         new Chart(ctx, {
             type: "line",
@@ -121,11 +173,11 @@
                 datasets: [{
                     label: "ELO Rating",
                     data: data,
-                    borderColor: "light-beige",
-                    backgroundColor: "rgba(0, 0, 255, 0.2)",
+                    borderColor: "#104730",  // Dark Green Line Color
+                    backgroundColor: "#c8c097",  // Light Beige Fill Color
                     borderWidth: 2,
                     pointRadius: 4,
-                    fill: false,
+                    fill: true,  // Fill the area below the line
                     tension: 0.2
                 }]
             },

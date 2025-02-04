@@ -178,7 +178,14 @@ def profile(request, username):
                 games_won += set_score[1]
                 games_lost += set_score[0]
 
-    game_win_percentage = (games_won / (games_won + games_lost)) * 100 if (games_won + games_lost) > 0 else 0
+    # Calculate totals
+    sets_played = sets_won + sets_lost
+    games_played = games_won + games_lost
+
+    # Calculate percentages
+    match_win_percentage = (matches_won / matches_played * 100) if matches_played > 0 else 0
+    set_win_percentage = (sets_won / sets_played * 100) if sets_played > 0 else 0
+    game_win_percentage = (games_won / games_played * 100) if games_played > 0 else 0
 
     # Get ELO history
     elo_history = player.elo_history.order_by('date')
@@ -191,9 +198,13 @@ def profile(request, username):
         'matches_lost': matches_lost,
         'sets_won': sets_won,
         'sets_lost': sets_lost,
+        'sets_played': sets_played,  # Pass the calculated total
         'games_won': games_won,
         'games_lost': games_lost,
-        'game_win_percentage': round(game_win_percentage, 2),
+        'games_played': games_played,  # Pass the calculated total
+        'match_win_percentage': round(match_win_percentage, 1),
+        'set_win_percentage': round(set_win_percentage, 1),
+        'game_win_percentage': round(game_win_percentage, 1),
         'elo_history': elo_history,  # Pass ELO history to the template
     }
 

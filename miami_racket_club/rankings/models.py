@@ -31,6 +31,28 @@ class Player(models.Model):
     neighborhood = models.CharField(max_length=50, choices=NEIGHBORHOOD_CHOICES, default='Other')
     phone_number = models.CharField(max_length=15, blank=True, null=True)  # US phone numbers only
 
+    def matches_played(self):
+        return self.matches_as_winner.count() + self.matches_as_loser.count()
+
+    def matches_won(self):
+        return self.matches_as_winner.count()
+
+    def sets_won(self):
+        return sum(match.sets_won for match in self.matches_as_winner.all()) + \
+               sum(match.sets_lost for match in self.matches_as_loser.all())
+
+    def sets_lost(self):
+        return sum(match.sets_lost for match in self.matches_as_winner.all()) + \
+               sum(match.sets_won for match in self.matches_as_loser.all())
+
+    def games_won(self):
+        return sum(match.games_won for match in self.matches_as_winner.all()) + \
+               sum(match.games_lost for match in self.matches_as_loser.all())
+
+    def games_lost(self):
+        return sum(match.games_lost for match in self.matches_as_winner.all()) + \
+               sum(match.games_won for match in self.matches_as_loser.all())
+
     def __str__(self):
         return self.user.username
 
