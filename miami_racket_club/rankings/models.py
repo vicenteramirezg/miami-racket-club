@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 import json
 
 class Player(models.Model):
@@ -75,9 +76,10 @@ class Match(models.Model):
         self.winner.elo_rating = new_winner_rating
         self.loser.elo_rating = new_loser_rating
 
-        # Log ELO changes
-        ELOHistory.objects.create(player=self.winner, elo_rating=new_winner_rating)
-        ELOHistory.objects.create(player=self.loser, elo_rating=new_loser_rating)
+        # Log ELO changes using the match date
+        match_datetime = timezone.make_aware(timezone.datetime.combine(self.date, timezone.datetime.min.time()))
+        ELOHistory.objects.create(player=self.winner, elo_rating=new_winner_rating, date=match_datetime)
+        ELOHistory.objects.create(player=self.loser, elo_rating=new_loser_rating, date=match_datetime)
 
         # Save the match
         super().save(*args, **kwargs)
@@ -85,7 +87,7 @@ class Match(models.Model):
 class ELOHistory(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history')
     elo_rating = models.IntegerField()
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField()  # Remove auto_now_add=True
 
     def __str__(self):
         return f"{self.player.user.username} - {self.elo_rating} on {self.date}"
