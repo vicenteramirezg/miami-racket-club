@@ -287,6 +287,9 @@ def player_directory(request):
     # Get all players ordered alphabetically by default
     players = Player.objects.order_by('first_name', 'last_name')
 
+    for player in players:
+        player.cleaned_phone = player.phone_number.replace('(', '').replace(')', '').replace('-', '').replace(' ', '')
+
     # Initialize filter variables
     neighborhoods = request.GET.getlist('neighborhood')  # Multiple neighborhoods can be selected
     min_rating = request.GET.get('min_rating')

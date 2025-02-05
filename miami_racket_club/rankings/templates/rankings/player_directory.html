@@ -25,16 +25,6 @@
                     <div class="col-md-8">
                         <label for="usta_rating_range" class="form-label">USTA Rating Range</label>
                         <div id="usta_rating_range" class="mb-3"></div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label for="min_rating" class="form-label">Minimum USTA Rating</label>
-                                <input type="number" step="0.1" name="min_rating" id="min_rating" class="form-control" value="{{ min_rating }}">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="max_rating" class="form-label">Maximum USTA Rating</label>
-                                <input type="number" step="0.1" name="max_rating" id="max_rating" class="form-control" value="{{ max_rating }}">
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -56,7 +46,7 @@
                         <th>Name</th>
                         <th>Neighborhood</th>
                         <th>USTA Rating</th>
-                        <th>Phone Number</th>
+                        <th>Contact</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,7 +55,17 @@
                             <td>{{ player.first_name }} {{ player.last_name }}</td>
                             <td>{{ player.neighborhood }}</td>
                             <td>{{ player.usta_rating }}</td>
-                            <td>{{ player.phone_number }}</td>
+                            <td>
+                                <!-- Clickable phone icon -->
+                                <a href="tel:+1{{ player.cleaned_phone }}" style="text-decoration: none; color: #104730;">
+                                    <i class="fas fa-phone-alt" style="font-size: 18px;"></i>
+                                </a>
+                                |
+                                <!-- WhatsApp button -->
+                                <a href="https://wa.me/+1{{ player.cleaned_phone }}?text=Hi! I would like to play some tennis." target="_blank" style="color: #25D366;">
+                                    <i class="fab fa-whatsapp" style="font-size: 1.5rem;"></i>
+                                </a>
+                            </td>
                         </tr>
                     {% empty %}
                         <tr>
@@ -107,8 +107,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const slider = document.getElementById('usta_rating_range');
-        const minInput = document.getElementById('min_rating');
-        const maxInput = document.getElementById('max_rating');
 
         noUiSlider.create(slider, {
             start: [{{ min_rating|default:3.0 }}, {{ max_rating|default:6.0 }}], // Default range
@@ -117,36 +115,36 @@
                 'min': 3.0, // Minimum USTA rating
                 'max': 6.0  // Maximum USTA rating
             },
-            step: 0.1, // Increment by 0.1
+            step: 0.25, // Increment by 0.25
             tooltips: true, // Show tooltips on handles
             format: {
                 to: function (value) {
-                    return value.toFixed(1); // Display one decimal place
+                    return value.toFixed(2); // Display two decimal places
                 },
                 from: function (value) {
                     return parseFloat(value); // Parse as float
                 }
             }
         });
-
-        // Update input fields when slider changes
-        slider.noUiSlider.on('update', function (values, handle) {
-            const value = values[handle];
-            if (handle === 0) {
-                minInput.value = value;
-            } else {
-                maxInput.value = value;
-            }
-        });
-
-        // Update slider when input fields change
-        minInput.addEventListener('change', function () {
-            slider.noUiSlider.set([this.value, null]);
-        });
-
-        maxInput.addEventListener('change', function () {
-            slider.noUiSlider.set([null, this.value]);
-        });
     });
 </script>
+
+<!-- Add custom CSS to style the range color -->
+<style>
+    /* Custom style for the range */
+    #usta_rating_range .noUi-connect {
+        background: #c8c097 !important; /* Set the range color to light beige */
+    }
+
+    /* Custom style for Select2 dropdown options */
+    .select2-container .select2-selection--multiple .select2-selection__rendered {
+        color: black !important; /* Set font color inside the selected items */
+    }
+    .select2-container .select2-dropdown {
+        color: black !important; /* Set font color inside the dropdown */
+    }
+</style>
+
+<!-- Add Font Awesome for phone icon and WhatsApp -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 {% endblock %}
