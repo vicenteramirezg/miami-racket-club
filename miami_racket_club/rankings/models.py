@@ -3,6 +3,12 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 import json
 
+# Define valid set scores
+VALID_SET_SCORES = [
+    (6, 0), (6, 1), (6, 2), (6, 3), (6, 4), (7, 5), (7, 6),
+    (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 7), (6, 7)
+]
+
 class Player(models.Model):
     NEIGHBORHOOD_CHOICES = sorted([
         ('Downtown', 'Downtown'),
@@ -89,6 +95,11 @@ class Match(models.Model):
             # Check if winner and loser are the same player
             if self.winner == self.loser:
                 raise ValueError("The winner and loser cannot be the same player.")
+            
+            # Validate each set score
+            for set_score in self.set_scores:
+                if set_score not in VALID_SET_SCORES:
+                    raise ValueError(f"Invalid set score: {set_score}. Valid scores are: {VALID_SET_SCORES}.")
             
             # Validate set scores
             winner_sets = 0

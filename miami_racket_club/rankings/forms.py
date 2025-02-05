@@ -7,6 +7,12 @@ import re
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
+# Define valid set scores
+VALID_SET_SCORES = [
+    (6, 0), (6, 1), (6, 2), (6, 3), (6, 4), (7, 5), (7, 6),
+    (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 7), (6, 7)
+]
+
 class MatchForm(forms.ModelForm):
     winner_games_set1 = forms.IntegerField(label='Set 1 Games (Winner)', min_value=0, max_value=7, widget=forms.NumberInput(attrs={'class': 'form-control'}))
     loser_games_set1 = forms.IntegerField(label='Set 1 Games (Loser)', min_value=0, max_value=7, widget=forms.NumberInput(attrs={'class': 'form-control'}))
@@ -50,6 +56,11 @@ class MatchForm(forms.ModelForm):
 
         if not set_scores:
             raise forms.ValidationError("At least one set must be recorded.")
+        
+        # Validate each set score
+        for set_score in set_scores:
+            if set_score not in VALID_SET_SCORES:
+                raise forms.ValidationError(f"Invalid set score: {set_score}.")
 
         winner_sets = sum(1 for w, l in set_scores if w > l)
         loser_sets = len(set_scores) - winner_sets
