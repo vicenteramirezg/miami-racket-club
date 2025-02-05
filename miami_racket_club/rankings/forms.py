@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from .models import Match, Player
 from django.forms import DateInput
 import re
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 class MatchForm(forms.ModelForm):
@@ -27,6 +28,11 @@ class MatchForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+
+        # Check if the match date is in the future
+        match_date = cleaned_data.get('date')
+        if match_date and match_date > timezone.now().date():
+            raise forms.ValidationError("The match date cannot be in the future.")
 
         winner = cleaned_data.get('winner')
         loser = cleaned_data.get('loser')

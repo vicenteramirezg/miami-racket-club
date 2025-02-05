@@ -82,6 +82,10 @@ class Match(models.Model):
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
+            # Check if the match date is in the future
+            if self.date > timezone.now().date():
+                raise ValueError("The match date cannot be in the future.")
+            
             # Check if winner and loser are the same player
             if self.winner == self.loser:
                 raise ValueError("The winner and loser cannot be the same player.")
