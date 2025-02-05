@@ -112,6 +112,8 @@ class Match(models.Model):
 
             if winner_sets <= loser_sets:
                 raise ValueError("The winner must win more sets than the loser.")
+            elif winner_sets == loser_sets:
+                raise ValueError("The match cannot end in a tie. One player must win more sets than the other.")
 
             # Calculate new ELO ratings
             winner_rating = self.winner.elo_rating

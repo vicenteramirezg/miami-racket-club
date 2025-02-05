@@ -67,6 +67,8 @@ class MatchForm(forms.ModelForm):
 
         if winner_sets <= loser_sets:
             raise forms.ValidationError("The winner must win more sets than the loser.")
+        elif winner_sets == loser_sets:
+            raise forms.ValidationError("The match cannot end in a tie. One player must win more sets than the other.")
 
         cleaned_data['set_scores'] = set_scores  # Ensure it's stored properly
         return cleaned_data
