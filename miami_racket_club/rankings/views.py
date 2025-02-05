@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
+from django.db.models import Q
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
@@ -281,3 +282,32 @@ class SignUpView(CreateView):
         # Log the user in
         login(self.request, user)
         return redirect(self.success_url)
+    
+def player_directory(request):
+    # Get all players ordered alphabetically by default
+    players = Player.objects.order_by('first_name', 'last_name')
+
+    # Initialize filter variables
+    neighborhoods = request.GET.getlist('neighborhood')  # Multiple neighborhoods can be selected
+    min_rating = request.GET.get('min_rating')
+    max_rating = request.GET.get('max_rating')
+
+    # Apply filters if provided
+    if neighborhoods:
+        players = players.filter(neighborhood__in=neighborhoods)
+    if min_rating:
+        players = players.filter(usta_rating__gte=float(min_rating))
+    if max_rating:
+        players = players.filter(usta_rating__lte=float(max_rating))
+
+    # Get unique neighborhoods for the filter dropdown
+    unique_neighborhoods = Player.objects.values_list('neighborhood', flat=True).distinct().order_by('neighborhood')
+
+    context = {
+        'players': players,
+        'unique_neighborhoods': unique_neighborhoods,
+        'selected_neighborhoods': neighborhoods,
+        'min_rating': min_rating,
+        'max_rating': max_rating,
+    }
+    return render(request, 'rankings/player_directory.html', context)

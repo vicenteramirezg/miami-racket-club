@@ -1,0 +1,152 @@
+{% extends 'rankings/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4 text-center" style="color: #c8c097;">Player Directory</h1>
+
+    <!-- Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{% url 'player_directory' %}">
+                <div class="row">
+                    <!-- Neighborhood Filter -->
+                    <div class="col-md-4">
+                        <label for="neighborhood" class="form-label">Neighborhood</label>
+                        <select name="neighborhood" id="neighborhood" class="form-select" multiple>
+                            {% for neighborhood in unique_neighborhoods %}
+                                <option value="{{ neighborhood }}" {% if neighborhood in selected_neighborhoods %}selected{% endif %}>
+                                    {{ neighborhood }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- USTA Rating Range Filter -->
+                    <div class="col-md-8">
+                        <label for="usta_rating_range" class="form-label">USTA Rating Range</label>
+                        <div id="usta_rating_range" class="mb-3"></div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="min_rating" class="form-label">Minimum USTA Rating</label>
+                                <input type="number" step="0.1" name="min_rating" id="min_rating" class="form-control" value="{{ min_rating }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="max_rating" class="form-label">Maximum USTA Rating</label>
+                                <input type="number" step="0.1" name="max_rating" id="max_rating" class="form-control" value="{{ max_rating }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary" style="background-color: #c8c097; border-color: #c8c097; color: #104730;">Apply Filters</button>
+                    <a href="{% url 'player_directory' %}" class="btn btn-secondary">Clear Filters</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Player Table -->
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Neighborhood</th>
+                        <th>USTA Rating</th>
+                        <th>Phone Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in players %}
+                        <tr>
+                            <td>{{ player.first_name }} {{ player.last_name }}</td>
+                            <td>{{ player.neighborhood }}</td>
+                            <td>{{ player.usta_rating }}</td>
+                            <td>{{ player.phone_number }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No players found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Include Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Include noUiSlider CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" rel="stylesheet" />
+
+<!-- Include jQuery (required for Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Include noUiSlider JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
+
+<!-- Initialize Select2 -->
+<script>
+    $(document).ready(function() {
+        $('#neighborhood').select2({
+            placeholder: "Select neighborhoods",
+            allowClear: true
+        });
+    });
+</script>
+
+<!-- Initialize noUiSlider -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const slider = document.getElementById('usta_rating_range');
+        const minInput = document.getElementById('min_rating');
+        const maxInput = document.getElementById('max_rating');
+
+        noUiSlider.create(slider, {
+            start: [{{ min_rating|default:3.0 }}, {{ max_rating|default:6.0 }}], // Default range
+            connect: true, // Connects the two handles
+            range: {
+                'min': 3.0, // Minimum USTA rating
+                'max': 6.0  // Maximum USTA rating
+            },
+            step: 0.1, // Increment by 0.1
+            tooltips: true, // Show tooltips on handles
+            format: {
+                to: function (value) {
+                    return value.toFixed(1); // Display one decimal place
+                },
+                from: function (value) {
+                    return parseFloat(value); // Parse as float
+                }
+            }
+        });
+
+        // Update input fields when slider changes
+        slider.noUiSlider.on('update', function (values, handle) {
+            const value = values[handle];
+            if (handle === 0) {
+                minInput.value = value;
+            } else {
+                maxInput.value = value;
+            }
+        });
+
+        // Update slider when input fields change
+        minInput.addEventListener('change', function () {
+            slider.noUiSlider.set([this.value, null]);
+        });
+
+        maxInput.addEventListener('change', function () {
+            slider.noUiSlider.set([null, this.value]);
+        });
+    });
+</script>
+{% endblock %}
