@@ -2,18 +2,17 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="my-4 text-center" style="color: #c8c097;">{{ player.user.username }}'s Profile</h1>  <!-- Light beige title -->
+    <h1 class="my-4 text-center" style="color: #c8c097;">{{ player.first_name }} {{ player.last_name }}</h1>  <!-- Light beige title -->
     <!-- Player Information (Centered at the Top) -->
     <div class="row justify-content-center mb-4">  <!-- Added mb-4 class for margin-bottom -->
         <div class="col-md-8 text-center">
             <div class="border p-4 rounded" style="background-color: #4c7563; border-color: #c8c097;">
                 <div class="card-body">
                     <p class="card-text">
-                        <strong class="light-beige">Name:</strong> {{ player.user.username }}<br>
                         <strong class="light-beige">Phone number:</strong> 
-                        <a href="tel:+{{ player.phone_number|slice:":3" }}{{ player.phone_number|slice:"3:6" }}{{ player.phone_number|slice:"6" }}" 
+                        <a href="tel:+{{ player.phone_number }}" 
                            style="color: #c8c097; text-decoration: none;"> 
-                            ({{ player.phone_number|slice:":3" }}) {{ player.phone_number|slice:"3:6" }}-{{ player.phone_number|slice:"6" }}
+                            {{ player.phone_number }}
                         </a><br>
                         <strong class="light-beige">Neighborhood:</strong> {{ player.neighborhood }}<br>
                         <strong class="light-beige">USTA Rating:</strong> {{ player.usta_rating }}<br>
