@@ -60,6 +60,7 @@ class Player(models.Model):
         # Sync first_name and last_name with the User model
         self.user.first_name = self.first_name
         self.user.last_name = self.last_name
+        self.user.last_name = self.last_name
         self.user.save()
         super().save(*args, **kwargs)
 
@@ -72,6 +73,9 @@ class Match(models.Model):
     set_scores = models.JSONField()
     date = models.DateField(auto_now_add=False)  # Allow custom dates
     notes = models.TextField(blank=True, null=True)  # Optional notes
+
+    submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="submitted_matches")
+    submitted_at = models.DateTimeField(auto_now_add=True)  # Timestamp when the match is submitted
 
     def __str__(self):
         return f"{self.winner} vs {self.loser} ({self.set_scores})"

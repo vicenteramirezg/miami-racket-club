@@ -13,29 +13,38 @@ class MatchForm(forms.ModelForm):
     loser_games_set2 = forms.IntegerField(label='Set 2 Games (Loser)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
     winner_games_set3 = forms.IntegerField(label='Set 3 Games (Winner)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
     loser_games_set3 = forms.IntegerField(label='Set 3 Games (Loser)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    
-    # Update the date field to use the mm-dd-yyyy format
+
     date = forms.DateField(
         label='Match Date',
         widget=DateInput(attrs={'type': 'date', 'class': 'form-control'}, format='%m-%d-%Y')
     )
-    
+
     notes = forms.CharField(label='Notes', widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), required=False)
 
     class Meta:
         model = Match
-        fields = ['winner', 'loser', 'date', 'notes']
+        fields = ['winner', 'loser', 'date', 'notes']  # Excluding `submitted_by`
 
     def clean(self):
         cleaned_data = super().clean()
-        # Combine set scores into the required format
-        set_scores = [
-            (cleaned_data.get('winner_games_set1'), cleaned_data.get('loser_games_set1')),
-            (cleaned_data.get('winner_games_set2'), cleaned_data.get('loser_games_set2')),
-        ]
-        if cleaned_data.get('winner_games_set3') is not None and cleaned_data.get('loser_games_set3') is not None:
-            set_scores.append((cleaned_data.get('winner_games_set3'), cleaned_data.get('loser_games_set3')))
-        cleaned_data['set_scores'] = set_scores
+
+        set_scores = []
+        for i in range(1, 4):  # Loop through possible sets
+            winner_score = cleaned_data.get(f'winner_games_set{i}')
+            loser_score = cleaned_data.get(f'loser_games_set{i}')
+            if winner_score is not None and loser_score is not None:
+                set_scores.append((winner_score, loser_score))
+
+        if not set_scores:
+            raise forms.ValidationError("At least one set must be recorded.")
+
+        winner_sets = sum(1 for w, l in set_scores if w > l)
+        loser_sets = len(set_scores) - winner_sets
+
+        if winner_sets <= loser_sets:
+            raise forms.ValidationError("The winner must win more sets than the loser.")
+
+        cleaned_data['set_scores'] = set_scores  # Ensure it's stored properly
         return cleaned_data
 
 # Helper function to generate floating point range
