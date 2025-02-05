@@ -28,6 +28,13 @@ class MatchForm(forms.ModelForm):
 
     notes = forms.CharField(label='Notes', widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), required=False)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Order players alphabetically by first name and last name
+        self.fields['winner'].queryset = Player.objects.order_by('first_name', 'last_name')
+        self.fields['loser'].queryset = Player.objects.order_by('first_name', 'last_name')
+
     class Meta:
         model = Match
         fields = ['winner', 'loser', 'date', 'notes']  # Excluding `submitted_by`
