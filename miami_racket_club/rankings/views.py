@@ -17,8 +17,8 @@ def submit_match(request):
         form = MatchForm(request.POST)
         if form.is_valid():
             match = form.save(commit=False)
-            match.set_scores = form.cleaned_data['set_scores']  # Save set scores
-            match.submitted_by = request.user  # Assign the logged-in user
+            match.set_scores = form.cleaned_data['set_scores']
+            match.submitted_by = request.user  # Set the user who submitted the match
             match.save()
             send_match_notification(match)  # Send notification
             return redirect('leaderboard')

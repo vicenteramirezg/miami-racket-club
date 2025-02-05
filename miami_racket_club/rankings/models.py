@@ -117,18 +117,22 @@ class Match(models.Model):
             self.winner.save()
             self.loser.save()
 
+            # Save the match
+            super().save(*args, **kwargs)
+
             # Log ELO changes using the match date
             match_datetime = timezone.make_aware(timezone.datetime.combine(self.date, timezone.datetime.min.time()))
             ELOHistory.objects.create(player=self.winner, elo_rating=new_winner_rating, date=match_datetime)
             ELOHistory.objects.create(player=self.loser, elo_rating=new_loser_rating, date=match_datetime)
 
-            # Save the match
-            super().save(*args, **kwargs)
+            
 
 class ELOHistory(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history')
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='elo_history')  # Link to Match
     elo_rating = models.IntegerField()
-    date = models.DateTimeField()  # Remove auto_now_add=True
+    date = models.DateTimeField()  # Match date (not auto-updating)
+    submitted_at = models.DateTimeField(default=timezone.now)  # Track when the log was recorded
 
     def __str__(self):
         return f"{self.player.user.username} - {self.elo_rating} on {self.date}"
