@@ -258,7 +258,7 @@ def profile(request, username):
     return render(request, 'rankings/profile.html', context)
 
 class SignUpView(CreateView):
-    form_class = CustomSignUpForm  # Use the custom form
+    form_class = CustomSignUpForm
     success_url = reverse_lazy('home')
     template_name = 'registration/signup.html'
 
@@ -266,14 +266,16 @@ class SignUpView(CreateView):
         # Save the User instance
         user = form.save()
 
-        # Create the Player instance and link it to the User
-        Player.objects.create(
+        # Ensure a Player instance is created only if one doesn't already exist
+        player, created = Player.objects.get_or_create(
             user=user,
-            first_name=form.cleaned_data['first_name'],
-            last_name=form.cleaned_data['last_name'],
-            usta_rating=form.cleaned_data['usta_rating'],
-            neighborhood=form.cleaned_data['neighborhood'],
-            phone_number=form.cleaned_data['phone_number']
+            defaults={
+                "first_name": form.cleaned_data.get("first_name", ""),
+                "last_name": form.cleaned_data.get("last_name", ""),
+                "usta_rating": form.cleaned_data.get("usta_rating", 3.00),
+                "neighborhood": form.cleaned_data.get("neighborhood", "Other"),
+                "phone_number": form.cleaned_data.get("phone_number", ""),
+            }
         )
 
         # Log the user in
