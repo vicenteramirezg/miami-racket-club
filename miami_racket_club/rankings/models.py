@@ -82,6 +82,10 @@ class Match(models.Model):
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
+            # Check if winner and loser are the same player
+            if self.winner == self.loser:
+                raise ValueError("The winner and loser cannot be the same player.")
+            
             # Validate set scores
             winner_sets = 0
             loser_sets = 0

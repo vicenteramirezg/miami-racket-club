@@ -4,12 +4,31 @@
 <div class="container">
     <h1 class="my-4 text-center" style="color: #c8c097;">Submit Match</h1> <!-- Light beige title -->
 
+    <!-- Error Message Section -->
+    {% if form.errors %}
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="alert alert-danger mb-4">
+                    <strong>Error:</strong> Please correct the following errors:
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     <form method="post">
         {% csrf_token %}
 
         <!-- Scoreboard & Match Details -->
         <div class="row justify-content-center">
-            <div class="col-lg-8"> 
+            <div class="col-lg-8">
+                <!-- Match Form -->
                 <div class="border p-4 rounded" style="background-color: #4c7563; border-color: #c8c097;"> <!-- Light green background, beige border -->
                     <div class="text-center fw-bold mb-3" style="color: #c8c097;">Match Score</div> <!-- Light beige title -->
                     

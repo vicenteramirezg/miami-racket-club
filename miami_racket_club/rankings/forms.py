@@ -28,6 +28,13 @@ class MatchForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
+        winner = cleaned_data.get('winner')
+        loser = cleaned_data.get('loser')
+
+        # Check if winner and loser are the same player
+        if winner and loser and winner == loser:
+            raise forms.ValidationError("The winner and loser cannot be the same player.")
+
         set_scores = []
         for i in range(1, 4):  # Loop through possible sets
             winner_score = cleaned_data.get(f'winner_games_set{i}')
