@@ -126,7 +126,7 @@ def send_match_notification(match):
 
                 .profile-button {{
                     display: inline-block;
-                    background-color: #104730; /* Dark green background */
+                    background-color: #c8c097; /* Light beige background */
                     color: #c8c097; /* Light beige text color */
                     padding: 12px 20px;
                     font-size: 16px;
@@ -138,7 +138,7 @@ def send_match_notification(match):
                 }}
 
                 .profile-button:hover {{
-                    background-color: #0b3c28; /* Darker green on hover */
+                    background-color: #9c9572; /* Darker green on hover */
                 }}
             </style>
         </head>
