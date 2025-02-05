@@ -122,8 +122,10 @@ class Match(models.Model):
 
             # Log ELO changes using the match date
             match_datetime = timezone.make_aware(timezone.datetime.combine(self.date, timezone.datetime.min.time()))
-            ELOHistory.objects.create(player=self.winner, elo_rating=new_winner_rating, date=match_datetime)
-            ELOHistory.objects.create(player=self.loser, elo_rating=new_loser_rating, date=match_datetime)
+            
+            # Creating ELOHistory and linking to the match
+            ELOHistory.objects.create(player=self.winner, elo_rating=new_winner_rating, date=match_datetime, match=self)
+            ELOHistory.objects.create(player=self.loser, elo_rating=new_loser_rating, date=match_datetime, match=self)
 
             
 

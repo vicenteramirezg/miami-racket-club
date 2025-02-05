@@ -44,6 +44,9 @@ def send_match_notification(match):
         opponent = match.loser.user.username if player == match.winner else match.winner.user.username
         result = "✅ Win" if player == match.winner else "❌ Lose"
 
+        # Create the profile URL
+        profile_url = f"{settings.SITE_URL}/profile/{player.user.username}"
+
         # Plain text version (fallback)
         plain_message = f'''
         🎉 A new match has been submitted!
@@ -53,6 +56,8 @@ def send_match_notification(match):
         - 📊 Score: {match.set_scores}
         - 📅 Date: {match.date}
         - 📝 Notes: {match.notes}
+
+        Visit your profile: {profile_url}
 
         See you on court!
         '''
@@ -112,11 +117,28 @@ def send_match_notification(match):
                 }}
 
                 a {{
-                    color: #104730;
-                    text-decoration: none;
+                    color: #c8c097; /* Light beige text color */
+                    text-decoration: none; /* Remove underline */
                 }}
                 a:hover {{
-                    text-decoration: underline;
+                    text-decoration: none; /* Ensure no underline on hover */
+                }}
+
+                .profile-button {{
+                    display: inline-block;
+                    background-color: #104730; /* Dark green background */
+                    color: #c8c097; /* Light beige text color */
+                    padding: 12px 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    text-align: center;
+                    transition: background-color 0.3s ease;
+                }}
+
+                .profile-button:hover {{
+                    background-color: #0b3c28; /* Darker green on hover */
                 }}
             </style>
         </head>
@@ -132,6 +154,9 @@ def send_match_notification(match):
                     <p><strong>📊 Score:</strong> {match.set_scores}</p>
                     <p><strong>📅 Date:</strong> {match.date}</p>
                     <p><strong>📝 Notes:</strong> {match.notes}</p>
+                    <p style="text-align: center;">
+                        <a href="{profile_url}" class="profile-button">View Profile</a>
+                    </p>
                 </div>
                 <div class="footer">
                     <p>See you on court!</p>
