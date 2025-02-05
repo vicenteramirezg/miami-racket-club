@@ -26,10 +26,13 @@ class Player(models.Model):
         ('Fort Lauderdale', 'Fort Lauderdale')
     ], key=lambda x: x[1])
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=50, blank=True, null=True)
+    last_name = models.CharField(max_length=50, blank=True, null=True)
     usta_rating = models.FloatField(default=3.00)
     elo_rating = models.IntegerField(default=1000)
     neighborhood = models.CharField(max_length=50, choices=NEIGHBORHOOD_CHOICES, default='Other')
     phone_number = models.CharField(max_length=15, blank=True, null=True)  # US phone numbers only
+    created_at = models.DateTimeField(default=timezone.now)  # Automatically set when the player is created
 
     def matches_played(self):
         return self.matches_as_winner.count() + self.matches_as_loser.count()
@@ -52,9 +55,16 @@ class Player(models.Model):
     def games_lost(self):
         return sum(match.games_lost for match in self.matches_as_winner.all()) + \
                sum(match.games_won for match in self.matches_as_loser.all())
+    
+    def save(self, *args, **kwargs):
+        # Sync first_name and last_name with the User model
+        self.user.first_name = self.first_name
+        self.user.last_name = self.last_name
+        self.user.save()
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.first_name} {self.last_name}" if self.first_name and self.last_name else self.user.username
 
 class Match(models.Model):
     winner = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="won_matches")

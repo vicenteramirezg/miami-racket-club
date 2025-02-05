@@ -9,7 +9,7 @@
             <div class="border p-4 rounded" style="background-color: #ffffff; border-color: #c8c097;"> <!-- White background with light beige border -->
                 <form method="post">
                     {% csrf_token %}
-                    
+
                     <!-- Username -->
                     <div class="mb-3 text-center">
                         <label for="{{ form.username.id_for_label }}" class="form-label" style="color: #c8c097;">{{ form.username.label }}</label>
@@ -20,6 +20,34 @@
                         {% endif %}
                         <div class="d-flex justify-content-center">{{ form.username }}</div>
                         {% for error in form.username.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- First Name -->
+                    <div class="mb-3 text-center">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label" style="color: #c8c097;">{{ form.first_name.label }}</label>
+                        {% if form.first_name.help_text %}
+                            <span class="text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="{{ form.first_name.help_text }}">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        {% endif %}
+                        <div class="d-flex justify-content-center">{{ form.first_name }}</div>
+                        {% for error in form.first_name.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Last Name -->
+                    <div class="mb-3 text-center">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label" style="color: #c8c097;">{{ form.last_name.label }}</label>
+                        {% if form.last_name.help_text %}
+                            <span class="text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="{{ form.last_name.help_text }}">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        {% endif %}
+                        <div class="d-flex justify-content-center">{{ form.last_name }}</div>
+                        {% for error in form.last_name.errors %}
                             <div class="alert alert-danger">{{ error }}</div>
                         {% endfor %}
                     </div>

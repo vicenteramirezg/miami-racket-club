@@ -45,10 +45,10 @@ def frange(start, stop, step):
         start += step
 
 class CustomSignUpForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-
+    email = forms.EmailField(required=True, label="Email")
+    first_name = forms.CharField(max_length=50, required=True, label="First Name")
+    last_name = forms.CharField(max_length=50, required=True, label="Last Name")
     neighborhood = forms.ChoiceField(choices=Player.NEIGHBORHOOD_CHOICES, label="Neighborhood")
-
     phone_number = forms.CharField(max_length=15, label="Phone Number", required=False)
 
     def clean_phone_number(self):
@@ -78,5 +78,27 @@ class CustomSignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2', 'usta_rating', 'neighborhood', 'phone_number')
+        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2', 'usta_rating', 'neighborhood', 'phone_number')
 
+    def save(self, commit=True):
+        # Save the User instance first
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        if commit:
+            user.save()
+
+        # Create the Player instance and link it to the User
+        player = Player(
+            user=user,
+            first_name=self.cleaned_data['first_name'],
+            last_name=self.cleaned_data['last_name'],
+            usta_rating=self.cleaned_data['usta_rating'],
+            neighborhood=self.cleaned_data['neighborhood'],
+            phone_number=self.cleaned_data['phone_number']
+        )
+        if commit:
+            player.save()
+
+        return user

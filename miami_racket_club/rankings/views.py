@@ -237,16 +237,19 @@ class SignUpView(CreateView):
     template_name = 'registration/signup.html'
 
     def form_valid(self, form):
+        # Save the User instance
         user = form.save()
-        usta_rating = form.cleaned_data.get('usta_rating')
 
-        # Save USTA Rating in Player model
+        # Create the Player instance and link it to the User
         Player.objects.create(
             user=user,
+            first_name=form.cleaned_data['first_name'],
+            last_name=form.cleaned_data['last_name'],
             usta_rating=form.cleaned_data['usta_rating'],
             neighborhood=form.cleaned_data['neighborhood'],
             phone_number=form.cleaned_data['phone_number']
         )
 
+        # Log the user in
         login(self.request, user)
         return redirect(self.success_url)
