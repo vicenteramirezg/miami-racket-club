@@ -31,6 +31,9 @@ def leaderboard(request):
     players = Player.objects.order_by('-elo_rating')
     return render(request, 'rankings/leaderboard.html', {'players': players})
 
+def terms_and_conditions(request):
+    return render(request, 'registration/terms_and_conditions.html')
+
 def send_match_notification(match):
     from_email = formataddr(("Miami Racket Club", settings.DEFAULT_FROM_EMAIL))
     subject = Header("New Match Submitted!", "utf-8").encode()

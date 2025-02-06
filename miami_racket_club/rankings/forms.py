@@ -93,6 +93,12 @@ class CustomSignUpForm(UserCreationForm):
     neighborhood = forms.ChoiceField(choices=Player.NEIGHBORHOOD_CHOICES, label="Neighborhood")
     phone_number = forms.CharField(max_length=15, label="Phone Number", required=False)
 
+    agree_to_terms = forms.BooleanField(
+        required=True,
+        label='I agree to the <a href="/terms-and-conditions/" target="_blank">Terms and Conditions</a>.',
+        error_messages={'required': 'You must agree to the Terms and Conditions to sign up.'}
+    )
+
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
         if phone_number:
@@ -120,7 +126,7 @@ class CustomSignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2', 'usta_rating', 'neighborhood', 'phone_number')
+        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2', 'usta_rating', 'neighborhood', 'phone_number', 'agree_to_terms')
 
     def save(self, commit=True):
         # Save the User instance first
