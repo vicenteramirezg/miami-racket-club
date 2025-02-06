@@ -43,7 +43,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Name</th>
+                        <th>Player</th> <!-- Changed "Name" to "Player" -->
                         <th>Neighborhood</th>
                         <th>USTA Rating</th>
                         <th>Contact</th>
@@ -52,7 +52,10 @@
                 <tbody>
                     {% for player in players %}
                         <tr>
-                            <td>{{ player.first_name }} {{ player.last_name }}</td>
+                            <td>
+                                <!-- Wrap the player's name in an <a> tag -->
+                                <a href="{% url 'profile' player.user.username %}">{{ player.first_name }} {{ player.last_name }}</a>
+                            </td>
                             <td>{{ player.neighborhood }}</td>
                             <td>{{ player.usta_rating }}</td>
                             <td>

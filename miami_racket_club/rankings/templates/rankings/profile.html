@@ -105,10 +105,15 @@
                             <tr>
                                 <td>{{ match.date|date:"Y-m-d" }}</td>
                                 <td>
+                                    <!-- Wrap the opponent's name in an <a> tag -->
                                     {% if match.winner == player %}
-                                        {{ match.loser.user.first_name }} {{ match.loser.user.last_name }}
+                                        <a href="{% url 'profile' match.loser.user.username %}">
+                                            {{ match.loser.user.first_name }} {{ match.loser.user.last_name }}
+                                        </a>
                                     {% else %}
-                                    {{ match.loser.user.first_name }} {{ match.loser.user.last_name }}
+                                        <a href="{% url 'profile' match.winner.user.username %}">
+                                            {{ match.winner.user.first_name }} {{ match.winner.user.last_name }}
+                                        </a>
                                     {% endif %}
                                 </td>
                                 <td>
