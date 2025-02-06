@@ -1,1 +1,1 @@
-web: gunicorn miami_racket_club.wsgi --log-file -
+web: gunicorn miami_racket_club.wsgi --chdir miami_racket_club --log-file -
