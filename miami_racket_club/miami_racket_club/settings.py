@@ -29,9 +29,11 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'miami-racket-club-496610aca6a3.herokuapp.com',
     '127.0.0.1',  # Localhost
     '10.0.0.245',  # Your Mac's local IP
-    '10.1.60.107' # Windows host
+    '10.1.60.107', # Windows host
+    os.environ.get("DJANGO_ALLOWED_HOSTS", "")
 ]
 
 LOGIN_REDIRECT_URL = 'home'  # Redirect to the homepage after login
