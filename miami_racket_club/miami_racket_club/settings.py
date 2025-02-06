@@ -94,7 +94,7 @@ WSGI_APPLICATION = "miami_racket_club.wsgi.application"
 #}
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv("DATABASE_URL", "sqlite:///db.sqlite3"))
+    'default': dj_database_url.config(default=os.environ.get('HEROKU_POSTGRESQL_WHITE_URL'))
 }
 
 
@@ -155,3 +155,6 @@ STATIC_URL = '/static/'
 MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ] + MIDDLEWARE
+
+# This line is crucial for proper static file handling in Heroku
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

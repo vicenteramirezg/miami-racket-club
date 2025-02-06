@@ -36,7 +36,7 @@ def send_match_notification(match):
     subject = Header("New Match Submitted!", "utf-8").encode()
     
     # Hosted/static image URL (update if necessary)
-    logo_url = "https://themiamiracketclub.com/static/rankings/logo.png"
+    logo_url = "https://miami-racket-club-496610aca6a3.herokuapp.com/static/rankings/logo-color.png"
 
     # Font URL (import Google Font)
     font_url = "https://fonts.googleapis.com/css2?family=Alegreya:wght@400;700&display=swap"
