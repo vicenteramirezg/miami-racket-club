@@ -119,16 +119,19 @@
                 flex-direction: column;
                 width: 100%;
                 background-color: #104730;
-                position: absolute;
-                top: 60px;
-                left: 0;
-                padding: 20px 0;
+                position: relative; /* Change from absolute to relative */
+                top: 0; /* Reset top position */
+                padding: 10px 0; /* Adjust padding */
             }
 
             .navbar-toggler {
                 display: block;
                 border: none;
                 background-color: transparent;
+            }
+
+            .navbar-collapse {
+                z-index: 1000; /* Ensure the menu is on top of other elements */
             }
         }
     </style>
