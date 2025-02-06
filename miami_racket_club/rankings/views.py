@@ -28,6 +28,7 @@ def submit_match(request):
         form = MatchForm()
     return render(request, 'rankings/submit_match.html', {'form': form})
 
+@login_required
 def leaderboard(request):
     players = Player.objects.order_by('-elo_rating')
     return render(request, 'rankings/leaderboard.html', {'players': players})
@@ -184,6 +185,7 @@ def home(request):
     }
     return render(request, 'rankings/home.html', context)
 
+@login_required
 def profile(request, username):
     player = get_object_or_404(Player, user__username=username)
     matches = Match.objects.filter(winner=player) | Match.objects.filter(loser=player)
@@ -289,7 +291,8 @@ class SignUpView(CreateView):
         # Log the user in
         login(self.request, user)
         return redirect(self.success_url)
-    
+
+@login_required    
 def player_directory(request):
     # Get all players ordered alphabetically by default
     players = Player.objects.order_by('first_name', 'last_name')
