@@ -148,7 +148,7 @@
         // Extract ELO history data from Django context
         const eloHistory = [
             {% for entry in elo_history %}
-                { date: "{{ entry.date|date:'Y-m-d'|escapejs }}", elo: {{ entry.elo_rating|escapejs }} },
+                { submitted_at: "{{ entry.submitted_at|date:'Y-m-d'|escapejs }}", elo: {{ entry.elo_rating|escapejs }} },
             {% endfor %}
         ];
 
@@ -157,17 +157,17 @@
 
         eloHistory.forEach(entry => {
             // If the date does not exist in the object or the current entry has a later ELO rating, update it
-            if (!latestEloPerDay[entry.date] || latestEloPerDay[entry.date].elo < entry.elo) {
-                latestEloPerDay[entry.date] = entry;
+            if (!latestEloPerDay[entry.submitted_at] || latestEloPerDay[entry.submitted_at].elo < entry.elo) {
+                latestEloPerDay[entry.submitted_at] = entry;
             }
         });
 
         // Convert the object back to an array and sort by date
         const filteredEloHistory = Object.values(latestEloPerDay)
-            .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
+            .sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at)); // Sort by date
 
         // Prepare data for Chart.js
-        const labels = filteredEloHistory.map(entry => entry.date);
+        const labels = filteredEloHistory.map(entry => entry.submitted_at);
         const data = filteredEloHistory.map(entry => entry.elo);
 
         new Chart(ctx, {
