@@ -252,3 +252,20 @@ select {
     max-width: 100%; /* Ensures dropdown doesn't overflow */
     width: 90%; /* Adjust as needed */
 }
+
+/* More specific styling for the Terms and Conditions link */
+label a.terms-link {
+    color: #c8c097; /* Black text color */
+}
+
+label a.terms-link:hover {
+    color: #c8c097; /* Light beige color on hover */
+    text-decoration: underline; /* Keep underline on hover */
+}
+
+/* Style for the neighborhood and USTA rating dropdown */
+.dropdown-wrapper select {
+    width: 30%; /* Adjust as needed */
+    max-width: 100%; /* Ensures dropdown doesn't overflow */
+    margin: 0 auto; /* Centers the dropdown */
+}
