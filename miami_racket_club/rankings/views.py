@@ -57,7 +57,7 @@ def send_match_notification(match):
 
         - 🏆 Result: {result}
         - 🆚 Opponent: {opponent}
-        - 📊 Score: {match.set_scores}
+        - 📊 Score: {match.clean_score}
         - 📅 Date: {match.date}
         - 📝 Notes: {match.notes}
 
@@ -155,7 +155,7 @@ def send_match_notification(match):
                     <h3>New Match Submitted</h3>
                     <p><strong>🏆 Result:</strong> {result}</p>
                     <p><strong>🆚 Opponent:</strong> {opponent}</p>
-                    <p><strong>📊 Score:</strong> {match.set_scores}</p>
+                    <p><strong>📊 Score:</strong> {match.clean_score}</p>
                     <p><strong>📅 Date:</strong> {match.date}</p>
                     <p><strong>📝 Notes:</strong> {match.notes}</p>
                     <p style="text-align: center;">
