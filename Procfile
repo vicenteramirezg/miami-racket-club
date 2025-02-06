@@ -1,0 +1,1 @@
+web: gunicorn miami-racket-club.wsgi --log-file -
