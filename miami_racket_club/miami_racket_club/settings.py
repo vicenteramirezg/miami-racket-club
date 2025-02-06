@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = [
     '127.0.0.1',  # Localhost
@@ -138,4 +138,4 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')  # Your Gmail address
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  # Your Gmail app password
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')  # Sender email
 
-SITE_URL = 'http://127.0.0.1:8000'  # Or replace with your live domain
+SITE_URL = config('SITE_URL')

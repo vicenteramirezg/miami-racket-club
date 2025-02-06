@@ -32,7 +32,7 @@ def leaderboard(request):
     return render(request, 'rankings/leaderboard.html', {'players': players})
 
 def send_match_notification(match):
-    from_email = formataddr(("🎾 Miami Racket Club", settings.DEFAULT_FROM_EMAIL))
+    from_email = formataddr(("Miami Racket Club", settings.DEFAULT_FROM_EMAIL))
     subject = Header("New Match Submitted!", "utf-8").encode()
     
     # Hosted/static image URL (update if necessary)
@@ -42,7 +42,7 @@ def send_match_notification(match):
     font_url = "https://fonts.googleapis.com/css2?family=Alegreya:wght@400;700&display=swap"
 
     for player in [match.winner, match.loser]:
-        opponent = match.loser.user.username if player == match.winner else match.winner.user.username
+        opponent = match.loser.user.first_name + ' ' + match.loser.user.last_name if player == match.winner else match.winner.user.first_name + ' ' + match.winner.user.last_name
         result = "✅ Win" if player == match.winner else "❌ Lose"
 
         # Create the profile URL
