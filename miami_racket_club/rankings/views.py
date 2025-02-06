@@ -37,7 +37,7 @@ def terms_and_conditions(request):
 
 def send_match_notification(match):
     from_email = formataddr(("Miami Racket Club", settings.DEFAULT_FROM_EMAIL))
-    subject = Header("New Match Submitted!", "utf-8").encode()
+    subject = Header("New Match Submitted", "utf-8").encode()
     
     # Hosted/static image URL (update if necessary)
     logo_url = "https://miami-racket-club-496610aca6a3.herokuapp.com/static/rankings/logo-color.png"
