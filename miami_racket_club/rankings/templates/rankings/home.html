@@ -13,6 +13,9 @@
                 {% if user.is_authenticated %}
                     <div class="text-center">
                         <p class="home-text">
+                            <a href="{% url 'profile' user.username %}" class="home-link">My Profile</a>
+                        </p>
+                        <p class="home-text">
                             <a href="{% url 'submit_match' %}" class="home-link">Submit a match</a>
                         </p>
                         <p class="home-text">
