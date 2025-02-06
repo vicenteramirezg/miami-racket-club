@@ -53,7 +53,7 @@ def send_match_notification(match):
         profile_url = f"{settings.SITE_URL}/profile/{player.user.username}"
 
         # Replace double spaces with &nbsp;
-        formatted_score = match.clean_score.replace("  ", "&nbsp;&nbsp;")
+        formatted_score = match.clean_score().replace("  ", "&nbsp;&nbsp;")
 
         # Plain text version (fallback)
         plain_message = f'''
