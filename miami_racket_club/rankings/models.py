@@ -84,7 +84,11 @@ class Match(models.Model):
     submitted_at = models.DateTimeField(auto_now_add=True)  # Timestamp when the match is submitted
 
     def __str__(self):
-        return f"{self.winner} vs {self.loser} ({self.set_scores})"
+        return f"{self.winner} vs {self.loser} ({self.clean_score()})"
+    
+    def clean_score(self):
+        """Formats set_scores into a readable string like '6-1 4-6 6-0'."""
+        return "  ".join(f"{set_score[0]}-{set_score[1]}" for set_score in self.set_scores)
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
@@ -147,8 +151,6 @@ class Match(models.Model):
             # Creating ELOHistory and linking to the match
             ELOHistory.objects.create(player=self.winner, elo_rating=new_winner_rating, date=match_datetime, match=self)
             ELOHistory.objects.create(player=self.loser, elo_rating=new_loser_rating, date=match_datetime, match=self)
-
-            
 
 class ELOHistory(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history')

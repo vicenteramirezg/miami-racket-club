@@ -123,7 +123,7 @@
                                         <span class="text-danger">Loss</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ match.set_scores }}</td>
+                                <td style="white-space: pre;">{{ match.clean_score }}</td>
                                 <td>{{ match.notes|default:"-" }}</td>
                             </tr>
                             {% empty %}
