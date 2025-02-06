@@ -146,7 +146,7 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')  # Your Gmail address
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  # Your Gmail app password
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')  # Sender email
 
-SITE_URL = 'http://127.0.0.1:8000'  # Or replace with your live domain
+SITE_URL = 'https://miami-racket-club-496610aca6a3.herokuapp.com'  # Or replace with your live domain
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
