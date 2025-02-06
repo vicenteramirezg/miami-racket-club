@@ -16,7 +16,7 @@
                         </a><br>
                         <strong class="light-beige">Neighborhood:</strong> {{ player.neighborhood }}<br>
                         <strong class="light-beige">USTA Rating:</strong> {{ player.usta_rating }}<br>
-                        <strong class="light-beige">ELO Rating:</strong> {{ player.elo_rating }}
+                        <strong class="light-beige">MRC Rating:</strong> {{ player.elo_rating }}
                     </p>
                 </div>
             </div>
@@ -75,7 +75,7 @@
         <div class="col-md-12">
             <div class="card mt-4">
                 <div class="card-body">
-                    <h5 class="card-title">ELO Rating History</h5>
+                    <h5 class="card-title">MRC Rating History</h5>
                     <div style="height: 200px;">  <!-- Fixed height container -->
                         <canvas id="eloChart"></canvas>
                     </div>
@@ -175,7 +175,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: "ELO Rating",
+                    label: "MRC Rating",
                     data: data,
                     borderColor: "#104730",  // Dark Green Line Color
                     backgroundColor: "#c8c097",  // Light Beige Fill Color
@@ -190,7 +190,7 @@
                 maintainAspectRatio: false,
                 scales: {
                     x: { title: { display: true, text: "Date" } },
-                    y: { title: { display: true, text: "ELO Rating" }, beginAtZero: false }
+                    y: { title: { display: true, text: "MRC Rating" }, beginAtZero: false }
                 }
             }
         });
