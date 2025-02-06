@@ -11,6 +11,7 @@ from .models import Player, Match
 from django.contrib.auth.decorators import login_required
 from email.header import Header
 from email.utils import formataddr
+from django.core.paginator import Paginator
 
 @login_required
 def submit_match(request):
@@ -290,13 +291,10 @@ def player_directory(request):
     # Get all players ordered alphabetically by default
     players = Player.objects.order_by('first_name', 'last_name')
 
-    for player in players:
-        player.cleaned_phone = player.phone_number.replace('(', '').replace(')', '').replace('-', '').replace(' ', '')
-
     # Initialize filter variables
     neighborhoods = request.GET.getlist('neighborhood')  # Multiple neighborhoods can be selected
-    min_rating = request.GET.get('min_rating')
-    max_rating = request.GET.get('max_rating')
+    min_rating = request.GET.get('min_rating', 3.0)  # Default min rating if not provided
+    max_rating = request.GET.get('max_rating', 6.0)  # Default max rating if not provided
 
     # Apply filters if provided
     if neighborhoods:
@@ -306,14 +304,23 @@ def player_directory(request):
     if max_rating:
         players = players.filter(usta_rating__lte=float(max_rating))
 
+    paginator = Paginator(players, 25)  # Show 25 players per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Clean phone numbers for paginated players
+    for player in page_obj:
+        player.cleaned_phone = player.phone_number.replace('(', '').replace(')', '').replace('-', '').replace(' ', '')
+
     # Get unique neighborhoods for the filter dropdown
     unique_neighborhoods = Player.objects.values_list('neighborhood', flat=True).distinct().order_by('neighborhood')
 
     context = {
         'players': players,
+        'page_obj': page_obj,
         'unique_neighborhoods': unique_neighborhoods,
         'selected_neighborhoods': neighborhoods,
-        'min_rating': min_rating,
-        'max_rating': max_rating,
+        'min_rating': float(min_rating),
+        'max_rating': float(max_rating),
     }
     return render(request, 'rankings/player_directory.html', context)

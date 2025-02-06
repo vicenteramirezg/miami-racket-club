@@ -20,14 +20,18 @@
                             {% endfor %}
                         </select>
                     </div>
-
+            
                     <!-- USTA Rating Range Filter -->
                     <div class="col-md-8">
                         <label for="usta_rating_range" class="form-label">USTA Rating Range</label>
                         <div id="usta_rating_range" class="mb-3"></div>
                     </div>
                 </div>
-
+            
+                <!-- Hidden inputs for USTA rating range -->
+                <input type="hidden" name="min_rating" id="min_rating" value="{{ min_rating|default:3.0 }}">
+                <input type="hidden" name="max_rating" id="max_rating" value="{{ max_rating|default:6.0 }}">
+            
                 <!-- Submit Button -->
                 <div class="text-center mt-3">
                     <button type="submit" class="btn btn-primary" style="background-color: #c8c097; border-color: #c8c097; color: #104730;">Apply Filters</button>
@@ -111,23 +115,42 @@
     document.addEventListener('DOMContentLoaded', function () {
         const slider = document.getElementById('usta_rating_range');
 
+        // Get the selected USTA rating range from the hidden inputs
+        const minRating = parseFloat(document.getElementById('min_rating').value);
+        const maxRating = parseFloat(document.getElementById('max_rating').value);
+
+        // Initialize the slider with the values from the hidden inputs
         noUiSlider.create(slider, {
-            start: [{{ min_rating|default:3.0 }}, {{ max_rating|default:6.0 }}], // Default range
-            connect: true, // Connects the two handles
+            start: [minRating, maxRating], // Use the values from the hidden inputs
+            connect: true,
             range: {
-                'min': 3.0, // Minimum USTA rating
-                'max': 6.0  // Maximum USTA rating
+                'min': 3.0,
+                'max': 6.0
             },
-            step: 0.25, // Increment by 0.25
-            tooltips: true, // Show tooltips on handles
+            step: 0.25,
+            tooltips: true,
             format: {
                 to: function (value) {
-                    return value.toFixed(2); // Display two decimal places
+                    return value.toFixed(2);
                 },
                 from: function (value) {
-                    return parseFloat(value); // Parse as float
+                    return parseFloat(value);
                 }
             }
+        });
+
+        // Update the hidden inputs with the slider values when the form is submitted
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function () {
+            const sliderValues = slider.noUiSlider.get();
+            document.getElementById('min_rating').value = sliderValues[0];
+            document.getElementById('max_rating').value = sliderValues[1];
+        });
+
+        // Update the hidden inputs when the slider values change
+        slider.noUiSlider.on('update', function (values, handle) {
+            document.getElementById('min_rating').value = values[0];
+            document.getElementById('max_rating').value = values[1];
         });
     });
 </script>
