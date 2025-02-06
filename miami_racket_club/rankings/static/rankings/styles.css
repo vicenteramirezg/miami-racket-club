@@ -247,3 +247,8 @@ a:hover {
 .stats-card.border-accent {
     border-top: 4px solid #104730; /* Dark green accent border */
 }
+
+select {
+    max-width: 100%; /* Ensures dropdown doesn't overflow */
+    width: 90%; /* Adjust as needed */
+}
