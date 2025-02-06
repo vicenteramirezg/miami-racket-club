@@ -1,6 +1,7 @@
 from django.db import models, transaction
 from django.contrib.auth.models import User
 from django.utils import timezone
+from .utils import calculate_dominance_factor, adjust_k_factor
 import json
 
 # Define valid set scores
@@ -119,38 +120,44 @@ class Match(models.Model):
             elif winner_sets == loser_sets:
                 raise ValueError("The match cannot end in a tie. One player must win more sets than the other.")
 
-            # Calculate new ELO ratings
-            winner_rating = self.winner.elo_rating
-            loser_rating = self.loser.elo_rating
+            # Calculate dominance factor
+        dominance_factor = calculate_dominance_factor(self.set_scores)
 
-            # Expected scores
-            expected_winner = 1 / (1 + 10 ** ((loser_rating - winner_rating) / 400))
-            expected_loser = 1 / (1 + 10 ** ((winner_rating - loser_rating) / 400))
+        # Base K-factor
+        base_k = 32
 
-            # K-factor (adjustable)
-            K = 32
+        # Adjust K-factor based on dominance
+        adjusted_k = adjust_k_factor(base_k, dominance_factor)
 
-            # New ratings
-            new_winner_rating = winner_rating + K * (1 - expected_winner)
-            new_loser_rating = loser_rating + K * (0 - expected_loser)
+        # Calculate new ELO ratings
+        winner_rating = self.winner.elo_rating
+        loser_rating = self.loser.elo_rating
 
-            # Update player ratings
-            self.winner.elo_rating = new_winner_rating
-            self.loser.elo_rating = new_loser_rating
+        # Expected scores
+        expected_winner = 1 / (1 + 10 ** ((loser_rating - winner_rating) / 400))
+        expected_loser = 1 / (1 + 10 ** ((winner_rating - loser_rating) / 400))
 
-            # Save the updated player ratings to the database
-            self.winner.save()
-            self.loser.save()
+        # New ratings
+        new_winner_rating = round(winner_rating + adjusted_k * (1 - expected_winner))
+        new_loser_rating = round(loser_rating + adjusted_k * (0 - expected_loser))
 
-            # Save the match
-            super().save(*args, **kwargs)
+        # Update player ratings
+        self.winner.elo_rating = new_winner_rating
+        self.loser.elo_rating = new_loser_rating
 
-            # Log ELO changes using the match date
-            match_datetime = timezone.make_aware(timezone.datetime.combine(self.date, timezone.datetime.min.time()))
-            
-            # Creating ELOHistory and linking to the match
-            ELOHistory.objects.create(player=self.winner, elo_rating=new_winner_rating, date=match_datetime, match=self)
-            ELOHistory.objects.create(player=self.loser, elo_rating=new_loser_rating, date=match_datetime, match=self)
+        # Save the updated player ratings to the database
+        self.winner.save()
+        self.loser.save()
+
+        # Save the match
+        super().save(*args, **kwargs)
+
+        # Log ELO changes using the match date
+        match_datetime = timezone.make_aware(timezone.datetime.combine(self.date, timezone.datetime.min.time()))
+        
+        # Creating ELOHistory and linking to the match
+        ELOHistory.objects.create(player=self.winner, elo_rating=new_winner_rating, date=match_datetime, match=self)
+        ELOHistory.objects.create(player=self.loser, elo_rating=new_loser_rating, date=match_datetime, match=self)
 
 class ELOHistory(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history')

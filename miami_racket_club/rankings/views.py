@@ -52,13 +52,16 @@ def send_match_notification(match):
         # Create the profile URL
         profile_url = f"{settings.SITE_URL}/profile/{player.user.username}"
 
+        # Replace double spaces with &nbsp;
+        formatted_score = match.clean_score.replace("  ", "&nbsp;&nbsp;")
+
         # Plain text version (fallback)
         plain_message = f'''
         🎉 A new match has been submitted!
 
         - 🏆 Result: {result}
         - 🆚 Opponent: {opponent}
-        - 📊 Score: {match.clean_score}
+        - 📊 Score: {formatted_score}
         - 📅 Date: {match.date}
         - 📝 Notes: {match.notes}
 
@@ -156,7 +159,7 @@ def send_match_notification(match):
                     <h3>New Match Submitted</h3>
                     <p><strong>🏆 Result:</strong> {result}</p>
                     <p><strong>🆚 Opponent:</strong> {opponent}</p>
-                    <p><strong>📊 Score:</strong> {match.clean_score}</p>
+                    <p><strong>📊 Score:</strong> {formatted_score}</p>
                     <p><strong>📅 Date:</strong> {match.date}</p>
                     <p><strong>📝 Notes:</strong> {match.notes}</p>
                     <p style="text-align: center;">
