@@ -106,9 +106,9 @@
                                 <td>{{ match.date|date:"Y-m-d" }}</td>
                                 <td>
                                     {% if match.winner == player %}
-                                        {{ match.loser.user.username }}
+                                        {{ match.loser.user.first_name }} {{ match.loser.user.last_name }}
                                     {% else %}
-                                        {{ match.winner.user.username }}
+                                    {{ match.loser.user.first_name }} {{ match.loser.user.last_name }}
                                     {% endif %}
                                 </td>
                                 <td>

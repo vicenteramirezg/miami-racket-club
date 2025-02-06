@@ -37,10 +37,10 @@
                                             <tr>
                                                 <td>{{ match.date|date:"Y-m-d" }}</td>
                                                 <td>
-                                                    <a href="{% url 'profile' match.winner.user.username %}">{{ match.winner.user.username }}</a>
+                                                    <a href="{% url 'profile' match.winner.user.username %}">{{ match.winner.user.first_name }} {{ match.winner.user.last_name }}</a>
                                                 </td>
                                                 <td>
-                                                    <a href="{% url 'profile' match.loser.user.username %}">{{ match.loser.user.username }}</a>
+                                                    <a href="{% url 'profile' match.loser.user.username %}">{{ match.loser.user.first_name }} {{ match.loser.user.last_name }}</a>
                                                 </td>
                                                 <td>{{ match.set_scores }}</td>
                                             </tr>

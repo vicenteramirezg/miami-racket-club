@@ -20,7 +20,7 @@
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td>
-                            <a href="{% url 'profile' player.user.username %}" class="text-decoration-none" style="color: #104730;">{{ player.user.username }}</a>
+                            <a href="{% url 'profile' player.user.username %}" class="text-decoration-none" style="color: #104730;">{{ player.user.first_name }} {{ player.user.last_name }}</a>
                         </td>
                         <td>{{ player.elo_rating }}</td>
                     </tr>
