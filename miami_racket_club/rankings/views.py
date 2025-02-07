@@ -7,7 +7,7 @@ from django.views.generic import CreateView
 from django.core.mail import send_mail
 from django.conf import settings
 from .forms import MatchForm, CustomSignUpForm  # Ensure this import is correct
-from .models import Player, Match
+from .models import Player, Match, ELOHistory
 from django.contrib.auth.decorators import login_required
 from email.header import Header
 from email.utils import formataddr
@@ -152,6 +152,9 @@ def send_match_notification(match):
             </style>
         </head>
         <body>
+            <!-- Hidden preview text -->
+            <span class="preview-text">A new match has been submitted. Check the details.</span>
+
             <div class="email-container">
                 <div class="email-header">
                     <img src="{logo_url}" alt="Miami Racket Club Logo">
@@ -191,6 +194,9 @@ def profile(request, username):
     matches = Match.objects.filter(winner=player) | Match.objects.filter(loser=player)
     matches = matches.order_by('-date')  # Show most recent matches first
 
+    # Fetch ELO history and ensure only the latest entry for each submitted_at date is included
+    elo_history = player.elo_history.order_by('submitted_at')
+
     # Calculate statistics
     matches_played = matches.count()
     matches_won = matches.filter(winner=player).count()
@@ -224,7 +230,7 @@ def profile(request, username):
     game_win_percentage = (games_won / games_played * 100) if games_played > 0 else 0
 
     # Get ELO history
-    elo_history = player.elo_history.order_by('date')
+    elo_history = player.elo_history.order_by('submitted_at')
 
     # Calculate Current Streak (most recent wins until a loss)
     current_streak = 0
