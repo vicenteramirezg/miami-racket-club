@@ -107,6 +107,12 @@
             placeholder: "Select neighborhoods",
             allowClear: true
         });
+
+        // Add a class to the placeholder for centering
+        $('#neighborhood').on('select2:open', function() {
+            let placeholder = $('.select2-selection--multiple .select2-selection__placeholder');
+            placeholder.css('text-align', 'center');
+        });
     });
 </script>
 

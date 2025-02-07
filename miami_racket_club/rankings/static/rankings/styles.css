@@ -269,3 +269,10 @@ label a.terms-link:hover {
     max-width: 100%; /* Ensures dropdown doesn't overflow */
     margin: 0 auto; /* Centers the dropdown */
 }
+
+/* Custom CSS to center the placeholder text */
+.select2-container .select2-selection--multiple .select2-selection__placeholder {
+    text-align: center;
+    width: 100%;
+    display: block;
+}
