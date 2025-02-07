@@ -149,6 +149,16 @@ def send_match_notification(match):
                 .profile-button:hover {{
                     background-color: #9c9572; /* Darker green on hover */
                 }}
+
+                /* Hidden preview text */
+                .preview-text {{
+                    display: none;
+                    font-size: 0;
+                    color: transparent;
+                    line-height: 0;
+                    max-height: 0;
+                    mso-hide: all; /* Hide in Outlook */
+                }}
             </style>
         </head>
         <body>
