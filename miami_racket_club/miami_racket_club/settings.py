@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,9 +28,11 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = [
+    config('HEROKU_URL'),
     '127.0.0.1',  # Localhost
     '10.0.0.245',  # Your Mac's local IP
-    '10.1.60.107' # Windows host
+    '10.1.60.107', # Windows host
+    os.environ.get("DJANGO_ALLOWED_HOSTS", "")
 ]
 
 LOGIN_REDIRECT_URL = 'home'  # Redirect to the homepage after login
@@ -82,12 +85,17 @@ WSGI_APPLICATION = "miami_racket_club.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+#DATABASES = {
+#    "default": {
+#        "ENGINE": "django.db.backends.sqlite3",
+#        "NAME": BASE_DIR / "db.sqlite3",
+#    }
+#}
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    'default': dj_database_url.config(default=os.environ.get('HEROKU_POSTGRESQL_WHITE_URL'))
 }
+
 
 
 # Password validation
@@ -139,3 +147,14 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  # Your Gmail app password
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')  # Sender email
 
 SITE_URL = config('SITE_URL')
+
+SSTATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+
+# Whitenoise settings
+MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+] + MIDDLEWARE
+
+# This line is crucial for proper static file handling in Heroku
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
