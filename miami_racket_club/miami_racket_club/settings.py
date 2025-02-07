@@ -32,8 +32,7 @@ SECURE_SSL_REDIRECT = True  # Redirect all non-HTTPS traffic to HTTPS
 
 ALLOWED_HOSTS = [
     config('HEROKU_URL'),
-    'themiamiracketclub.com',
-    'www.themiamiracketclub.com'
+    'rankings.themiamiracketclub.com',
     '127.0.0.1',  # Localhost
     '10.0.0.245',  # Your Mac's local IP
     '10.1.60.107', # Windows host
