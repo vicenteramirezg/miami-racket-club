@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import dj_database_url
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -93,7 +94,7 @@ WSGI_APPLICATION = "miami_racket_club.wsgi.application"
 #}
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('HEROKU_POSTGRESQL_WHITE_URL'))
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 
 
