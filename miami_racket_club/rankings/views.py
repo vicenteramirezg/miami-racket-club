@@ -438,7 +438,6 @@ class SignUpView(CreateView):
                     <h3>Your Account has been submitted</h3>
                     <p>Hi, {user.first_name}</p>
                     <p>Your account submission has been sent and is now being reviewed.</p>
-                    <p>We look forward to seeing you on the court!</p>
                 </div>
                 <div class="footer">
                     <p>See you on court!</p>
