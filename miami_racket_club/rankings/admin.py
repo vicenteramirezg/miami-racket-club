@@ -27,7 +27,7 @@ class PlayerAdmin(admin.ModelAdmin):
 
     def send_approval_email(self, user):
         from_email = formataddr(("Miami Racket Club", settings.DEFAULT_FROM_EMAIL))
-        subject = Header("Your Account Has Been Approved", "utf-8").encode()
+        subject = Header("Your account has been approved", "utf-8").encode()
         
         # Hosted/static image URL (update if necessary)
         logo_url = "https://miami-racket-club-496610aca6a3.herokuapp.com/static/rankings/logo-color.png"
