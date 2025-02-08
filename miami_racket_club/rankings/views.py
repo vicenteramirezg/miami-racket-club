@@ -317,7 +317,7 @@ class SignUpView(CreateView):
 
         # Send the welcome email (only if the player was just created)
         if created:
-            self.send_welcome_email(player)
+            self.send_welcome_email(user)  # Pass the user object here
 
         # Don't log the user in if they are pending approval
         if user.is_approved:
