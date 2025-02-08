@@ -2,8 +2,8 @@ from django.contrib import admin
 from .models import Player, Match
 
 class PlayerAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_approved')  # Use 'is_approved' instead of 'approved'
-    list_filter = ('is_approved',)  # Use 'is_approved' here too
+    list_display = ('user__first_name', 'user__last_name', 'user', 'is_approved')  # Added first_name and last_name
+    list_filter = ('is_approved',)
     actions = ['approve_players']
 
     def approve_players(self, request, queryset):
