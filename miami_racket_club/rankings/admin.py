@@ -13,12 +13,16 @@ class PlayerAdmin(admin.ModelAdmin):
     def approve_players(self, request, queryset):
         for player in queryset:
             player.is_approved = True
-            player.save()
+            player.save()  # Save the player first
+
+            # Manually refresh the player object after saving to ensure it's up to date
+            player.refresh_from_db()
 
             # Send email to the user when approved
             self.send_approval_email(player.user)
 
         self.message_user(request, "Selected players have been approved and notified.")
+
     approve_players.short_description = "Approve selected players"
 
     def send_approval_email(self, user):
