@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import dj_database_url
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,8 +28,14 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG')
 
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 ALLOWED_HOSTS = [
     config('HEROKU_URL'),
+    'rankings.themiamiracketclub.com',
     '127.0.0.1',  # Localhost
     '10.0.0.245',  # Your Mac's local IP
     '10.1.60.107', # Windows host
@@ -93,7 +100,7 @@ WSGI_APPLICATION = "miami_racket_club.wsgi.application"
 #}
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('HEROKU_POSTGRESQL_WHITE_URL'))
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 
 
@@ -148,7 +155,7 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')  # Sender email
 
 SITE_URL = config('SITE_URL')
 
-SSTATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 # Whitenoise settings
