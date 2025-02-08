@@ -86,8 +86,18 @@ a:hover {
 }
 
 .home-link:hover {
-    color: #104730;
-    text-decoration: underline;
+    color: #c8c097; /* Keep light beige on hover */
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* Optional: Add a slight hover effect to links within the home page */
+.home-text a {
+    color: #c8c097;
+}
+
+.home-text a:hover {
+    color: #c8c097;
+    text-decoration: underline; /* Keep underline on hover */
 }
 
 /* Styling for Winner and Loser profile links inside Recent Matches table */

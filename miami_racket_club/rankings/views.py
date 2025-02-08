@@ -1,19 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate, get_user_model
+from django.contrib import messages
 from django.db.models import Q
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.core.mail import send_mail
 from django.conf import settings
 from .forms import MatchForm, CustomSignUpForm  # Ensure this import is correct
 from .models import Player, Match, ELOHistory
+from .decorators import approved_required
 from django.contrib.auth.decorators import login_required
 from email.header import Header
 from email.utils import formataddr
 from django.core.paginator import Paginator
 
 @login_required
+@approved_required
 def submit_match(request):
     if request.method == 'POST':
         form = MatchForm(request.POST)
@@ -29,6 +34,7 @@ def submit_match(request):
     return render(request, 'rankings/submit_match.html', {'form': form})
 
 @login_required
+@approved_required
 def leaderboard(request):
     players = Player.objects.order_by('-elo_rating')
     return render(request, 'rankings/leaderboard.html', {'players': players})
@@ -191,6 +197,7 @@ def send_match_notification(match):
         recipient_list = [player.user.email]
         send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
 
+@approved_required
 def home(request):
     recent_matches = Match.objects.order_by('-date')[:5]  # Get the 5 most recent matches
     context = {
@@ -199,6 +206,7 @@ def home(request):
     return render(request, 'rankings/home.html', context)
 
 @login_required
+@approved_required
 def profile(request, username):
     player = get_object_or_404(Player, user__username=username)
     matches = Match.objects.filter(winner=player) | Match.objects.filter(loser=player)
@@ -290,7 +298,10 @@ class SignUpView(CreateView):
 
     def form_valid(self, form):
         # Save the User instance
-        user = form.save()
+        user = form.save(commit=False)
+        user.is_approved = False  # Ensure new users require admin approval
+        user.backend = 'django.contrib.auth.backends.ModelBackend'  # Set the backend here
+        user.save()
 
         # Ensure a Player instance is created only if one doesn't already exist
         player, created = Player.objects.get_or_create(
@@ -304,11 +315,29 @@ class SignUpView(CreateView):
             }
         )
 
-        # Log the user in
-        login(self.request, user)
-        return redirect(self.success_url)
+        # Don't log the user in if they are pending approval
+        if user.is_approved:
+            login(self.request, user)
 
-@login_required    
+        # Redirect to a custom page indicating that approval is pending
+        return redirect('pending_approval')  # Redirect to the pending approval page
+
+# You can use this for login to also handle redirecting users who are not approved
+class CustomLoginView(LoginView):
+    form_class = AuthenticationForm
+
+    def form_valid(self, form):
+        user = form.get_user()
+        
+        # Check if the user is approved
+        if user.player.is_approved:
+            return super().form_valid(form)  # Allow the login to proceed
+        else:
+            # Redirect unapproved users to the 'pending_approval' page
+            return redirect('pending_approval')
+
+@login_required
+@approved_required   
 def player_directory(request):
     # Get all players ordered alphabetically by default
     players = Player.objects.order_by('first_name', 'last_name')
@@ -346,3 +375,6 @@ def player_directory(request):
         'max_rating': float(max_rating),
     }
     return render(request, 'rankings/player_directory.html', context)
+
+def pending_approval(request):
+    return render(request, 'registration/pending_approval.html')

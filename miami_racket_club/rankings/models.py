@@ -40,6 +40,7 @@ class Player(models.Model):
     neighborhood = models.CharField(max_length=50, choices=NEIGHBORHOOD_CHOICES, default='Other')
     phone_number = models.CharField(max_length=15, blank=True, null=True)  # US phone numbers only
     created_at = models.DateTimeField(default=timezone.now)  # Automatically set when the player is created
+    is_approved = models.BooleanField(default=False)  # Tracks admin approval
 
     def matches_played(self):
         return self.matches_as_winner.count() + self.matches_as_loser.count()
@@ -72,7 +73,7 @@ class Player(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}" if self.first_name and self.last_name else self.user.username
+        return f"{self.first_name} {self.last_name}" if self.first_name and self.last_name else f"{self.user.username}"
 
 class Match(models.Model):
     winner = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="won_matches")
