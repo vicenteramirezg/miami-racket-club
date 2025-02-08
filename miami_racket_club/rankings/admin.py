@@ -139,7 +139,7 @@ class PlayerAdmin(admin.ModelAdmin):
                     <p>Your account at MRC Rankings has been approved. You now have access to all the features of the app.</p>
                     <p>We look forward to seeing you on the court!</p>
                     <p style="text-align: center;">
-                        <a href="{settings.SITE_URL}/profile/{user.username}" class="profile-button">View Your Profile</a>
+                        <a href="{settings.SITE_URL}" class="profile-button">Go to App</a>
                     </p>
                 </div>
                 <div class="footer">
