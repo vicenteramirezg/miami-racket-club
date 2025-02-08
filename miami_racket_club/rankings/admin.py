@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.core.mail import send_mail
 from django.conf import settings
-from django.utils.email import formataddr
+from email.utils import formataddr
 from email.header import Header
 from .models import Player, Match
 
