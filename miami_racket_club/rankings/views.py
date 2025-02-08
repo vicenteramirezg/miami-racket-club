@@ -184,6 +184,7 @@ def send_match_notification(match):
                     <p><strong>📝 Notes:</strong> {match.notes}</p>
                     <p style="text-align: center;">
                         <a href="{profile_url}" class="profile-button">View Profile</a>
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfSGy5zy6x8zSiVnA5s2a7ImnUOgiP3hN4rbmecO_RYJWRu6Q/viewform?usp=sharing" class="survey-button">Fill Out Survey</a>
                     </p>
                 </div>
                 <div class="footer">
