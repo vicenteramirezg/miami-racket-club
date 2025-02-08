@@ -286,3 +286,9 @@ label a.terms-link:hover {
     width: 100%;
     display: block;
 }
+
+/* Instagram logo styling */
+.footer .instagram-logo {
+    width: 40px; /* Adjust size as necessary */
+    margin-bottom: 10px; /* Space between icon and text */
+}
