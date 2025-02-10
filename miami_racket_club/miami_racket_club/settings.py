@@ -74,7 +74,7 @@ ROOT_URLCONF = "miami_racket_club.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "rankings/templates"],  # Explicitly define template directory
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

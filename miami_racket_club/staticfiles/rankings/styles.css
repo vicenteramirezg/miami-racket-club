@@ -1,0 +1,294 @@
+/* Ensure input fields are visible */
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Style links globally */
+a {
+    color: #c8c097; /* Light beige text */
+    text-decoration: none; /* Remove underline */
+}
+
+a:hover {
+    color: #ffffff; /* White on hover */
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* Style player name links only on the leaderboard page */
+.leaderboard-page table a {
+    color: #000000; /* Black text */
+    text-decoration: none; /* Remove underline */
+}
+
+.leaderboard-page table a:hover {
+    color: #c8c097; /* Light beige on hover */
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* Tooltip styling */
+[data-bs-toggle="tooltip"] {
+    cursor: pointer;
+}
+
+.bi-info-circle {
+    margin-left: 10px;
+    font-size: 1.2rem;
+    color: #c8c097;
+}
+
+/* Optional: Add a slight hover effect to tooltips */
+[data-bs-toggle="tooltip"]:hover {
+    color: #104730;
+}
+
+/* Additional custom styles for the form */
+.form-label {
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: #c8c097;
+    border-color: #c8c097;
+    color: #104730;
+}
+
+.btn-primary:hover {
+    background-color: #ffffff;
+    color: #104730;
+    border-color: #c8c097;
+}
+
+/* For the form error messages */
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.home-title {
+    color: #c8c097;
+}
+
+.home-link {
+    color: #c8c097;
+}
+
+.home-link:hover {
+    color: #c8c097; /* Keep light beige on hover */
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* Optional: Add a slight hover effect to links within the home page */
+.home-text a {
+    color: #c8c097;
+}
+
+.home-text a:hover {
+    color: #c8c097;
+    text-decoration: underline; /* Keep underline on hover */
+}
+
+/* Styling for Winner and Loser profile links inside Recent Matches table */
+.table a {
+    color: #000000; /* Black text */
+    text-decoration: none; /* Remove underline */
+}
+
+.table a:hover {
+    color: #c8c097; /* Light beige on hover */
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* Style for the Navbar (already in base.html) */
+.navbar-nav {
+    display: flex;
+    gap: 20px;
+}
+
+.navbar-nav a {
+    color: #c8c097;
+}
+
+.navbar-nav .nav-link {
+    padding: 10px;
+}
+
+.navbar-nav .navbar-toggler {
+    border: none;
+    background-color: transparent;
+}
+
+/* Style for the mobile Hamburger Menu */
+@media screen and (max-width: 768px) {
+    /* Background color for the expanded menu */
+    .navbar-collapse {
+        background-color: #4c7563 !important; /* Light green background */
+        padding: 10px 20px; /* Add some padding for better spacing */
+        border-radius: 5px; /* Optional: Add rounded corners */
+        margin-top: 10px; /* Add some space between the hamburger icon and the menu */
+    }
+
+    /* Text color for the menu items */
+    .navbar-nav .nav-link {
+        color: #c8c097 !important; /* Light beige text */
+        padding: 10px 0; /* Add padding to each link for better spacing */
+    }
+
+    /* Hover effect for the menu items */
+    .navbar-nav .nav-link:hover {
+        color: #ffffff !important; /* White text on hover */
+    }
+
+    /* Style the logout button to match the menu */
+    .navbar-nav .btn-link {
+        color: #c8c097 !important; /* Light beige text */
+        padding: 10px 0; /* Match padding with other links */
+        text-align: left; /* Align text to the left */
+    }
+
+    .navbar-nav .btn-link:hover {
+        color: #ffffff !important; /* White text on hover */
+    }
+}
+
+/* Customize the hamburger icon color */
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='%23c8c097' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Desktop Navbar - Align the navbar items to the right */
+@media screen and (min-width: 768px) {
+    .navbar-nav {
+        margin-left: auto; /* This pushes the navbar links to the right */
+    }
+
+    .navbar-nav .nav-link {
+        padding: 10px 15px; /* Adjust padding for better spacing */
+    }
+}
+
+/* Styling for the Leaderboard Table */
+.leaderboard-page table {
+    background-color: #4c7563; /* Light green background for the entire table */
+    border-radius: 8px; /* Optional: Add rounded corners */
+    overflow: hidden; /* Ensure corners are rounded */
+}
+
+/* Table header styles for leaderboard */
+.leaderboard-page table thead {
+    background-color: #c8c097; /* Light beige for the header */
+    color: #104730; /* Dark green text for contrast */
+}
+
+.leaderboard-page table thead th {
+    font-weight: 600; /* Make the header text bold */
+    padding: 12px; /* Add padding to the header cells */
+}
+
+/* Table body styles for leaderboard */
+.leaderboard-page table tbody {
+    background-color: #ffffff; /* White background for the body */
+}
+
+.leaderboard-page table tbody td {
+    padding: 10px; /* Add padding to the table cells */
+    color: #495057; /* Default dark gray color for text */
+}
+
+/* Optional: Add alternating row colors for better readability */
+.leaderboard-page table tbody tr:nth-child(even) {
+    background-color: #f7f7f7; /* Light gray background for even rows */
+}
+
+/* Table row hover effect */
+.leaderboard-page table tbody tr:hover {
+    background-color: #e6f0e2; /* Slight light green on hover */
+}
+
+/* Custom styles for the big stats cards */
+.stats-card {
+    background-color: #ffffff; /* White background */
+    border: 1px solid #e0e0e0; /* Light border */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+.stats-card:hover {
+    transform: translateY(-5px); /* Slight lift on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+.stats-card .card-title {
+    font-size: 1.25rem; /* Larger title */
+    color: #104730; /* Dark green text */
+    margin-bottom: 1rem; /* Spacing below the title */
+}
+
+.stats-card .display-4 {
+    font-weight: 700; /* Bold big numbers */
+    color: #104730; /* Dark green text */
+    margin-bottom: 0.5rem; /* Spacing below the big number */
+}
+
+.stats-card .card-text {
+    font-size: 0.9rem; /* Smaller text for details */
+    color: #6c757d; /* Gray text for contrast */
+}
+
+/* Optional: Add a gradient background for a modern look */
+.stats-card.gradient-bg {
+    background: linear-gradient(135deg, #c8c097, #ffffff); /* Light beige to white gradient */
+}
+
+/* Optional: Add a border accent for a pop of color */
+.stats-card.border-accent {
+    border-top: 4px solid #104730; /* Dark green accent border */
+}
+
+select {
+    max-width: 100%; /* Ensures dropdown doesn't overflow */
+    width: 90%; /* Adjust as needed */
+}
+
+/* More specific styling for the Terms and Conditions link */
+label a.terms-link {
+    color: #c8c097; /* Black text color */
+}
+
+label a.terms-link:hover {
+    color: #c8c097; /* Light beige color on hover */
+    text-decoration: underline; /* Keep underline on hover */
+}
+
+/* Style for the neighborhood and USTA rating dropdown */
+.dropdown-wrapper select {
+    width: 30%; /* Adjust as needed */
+    max-width: 100%; /* Ensures dropdown doesn't overflow */
+    margin: 0 auto; /* Centers the dropdown */
+}
+
+/* Custom CSS to center the placeholder text */
+.select2-container .select2-selection--multiple .select2-selection__placeholder {
+    text-align: center;
+    width: 100%;
+    display: block;
+}
+
+/* Instagram logo styling */
+.footer .instagram-logo {
+    width: 40px; /* Adjust size as necessary */
+    margin-bottom: 10px; /* Space between icon and text */
+}

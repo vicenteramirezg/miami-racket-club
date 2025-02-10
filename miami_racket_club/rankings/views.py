@@ -4,11 +4,11 @@ from django.contrib import messages
 from django.db.models import Q
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetView
 from django.contrib.auth.models import User  # Add this import
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
 from .forms import MatchForm, CustomSignUpForm, UsernameRetrievalForm  # Ensure this import is correct
 from .models import Player, Match, ELOHistory
@@ -17,6 +17,8 @@ from django.contrib.auth.decorators import login_required
 from email.header import Header
 from email.utils import formataddr
 from django.core.paginator import Paginator
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 @login_required
 @approved_required
@@ -654,5 +656,18 @@ def send_username_email(user):
 def username_retrieval_done(request):
     return render(request, 'registration/username_retrieval_done.html')
 
-def username_retrieval_done(request):
-    return render(request, 'registration/username_retrieval_done.html')
+class CustomPasswordResetView(PasswordResetView):
+    def send_mail(self, subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None):
+        """
+        Send a django.core.mail.EmailMultiAlternatives to `to_email`.
+        """
+        subject = render_to_string(subject_template_name, context)
+        subject = ''.join(subject.splitlines())  # Remove any newlines
+        body = render_to_string(email_template_name, context)
+
+        email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
+        if html_email_template_name:
+            html_email = render_to_string(html_email_template_name, context)
+            email_message.attach_alternative(html_email, 'text/html')
+
+        email_message.send()
