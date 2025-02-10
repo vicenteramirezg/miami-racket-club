@@ -150,3 +150,6 @@ class CustomSignUpForm(UserCreationForm):
             player.save()
 
         return user
+    
+class UsernameRetrievalForm(forms.Form):
+    email = forms.EmailField(label="Enter your email address")

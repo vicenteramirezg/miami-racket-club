@@ -5,11 +5,12 @@ from django.db.models import Q
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.models import User  # Add this import
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.core.mail import send_mail
 from django.conf import settings
-from .forms import MatchForm, CustomSignUpForm  # Ensure this import is correct
+from .forms import MatchForm, CustomSignUpForm, UsernameRetrievalForm  # Ensure this import is correct
 from .models import Player, Match, ELOHistory
 from .decorators import approved_required
 from django.contrib.auth.decorators import login_required
@@ -508,3 +509,150 @@ def player_directory(request):
 
 def pending_approval(request):
     return render(request, 'registration/pending_approval.html')
+
+def username_retrieval(request):
+    if request.method == 'POST':
+        form = UsernameRetrievalForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user = User.objects.get(email=email)
+                send_username_email(user)  # Send the styled email
+                return redirect('username_retrieval_done')
+            except User.DoesNotExist:
+                form.add_error('email', 'No user found with this email address.')
+    else:
+        form = UsernameRetrievalForm()
+    return render(request, 'registration/username_retrieval.html', {'form': form})
+
+def send_username_email(user):
+    from_email = formataddr(("Miami Racket Club", settings.DEFAULT_FROM_EMAIL))
+    subject = Header("Your Miami Racket Club Username", "utf-8").encode()
+
+    # Hosted/static image URL (update if necessary)
+    logo_url = "https://miami-racket-club-496610aca6a3.herokuapp.com/static/rankings/logo-color.png"
+
+    # Font URL (import Google Font)
+    font_url = "https://fonts.googleapis.com/css2?family=Alegreya:wght@400;700&display=swap"
+
+    # HTML version with logo and styles
+    html_message = f'''
+    <html>
+    <head>
+        <style>
+            /* Import Alegreya font */
+            @import url('{font_url}');
+
+            /* Apply custom styles */
+            body {{
+                font-family: 'Alegreya', serif;
+                color: #104730; /* Dark green text */
+                background-color: #ffffff; /* White background */
+                margin: 0;
+                padding: 20px;
+            }}
+
+            .email-container {{
+                max-width: 500px;
+                margin: auto;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                background-color: #f9f9f9;
+            }}
+
+            .email-header {{
+                text-align: center;
+            }}
+
+            .email-header img {{
+                max-width: 150px;
+                margin-bottom: 10px;
+            }}
+
+            .email-content {{
+                text-align: center;
+            }}
+
+            h3 {{
+                color: #104730; /* Dark green for the header */
+            }}
+
+            p {{
+                font-size: 16px;
+                margin: 10px 0;
+            }}
+
+            .footer {{
+                margin-top: 20px;
+                text-align: center;
+                font-size: 14px;
+            }}
+
+            a {{
+                color: #c8c097; /* Light beige text color */
+                text-decoration: none; /* Remove underline */
+            }}
+            a:hover {{
+                text-decoration: none; /* Ensure no underline on hover */
+            }}
+
+            .profile-button {{
+                display: inline-block;
+                background-color: #c8c097; /* Light beige background */
+                color: #c8c097; /* Light beige text color */
+                padding: 12px 20px;
+                font-size: 16px;
+                font-weight: bold;
+                text-decoration: none;
+                border-radius: 8px;
+                text-align: center;
+                transition: background-color 0.3s ease;
+            }}
+
+            .profile-button:hover {{
+                background-color: #9c9572; /* Darker green on hover */
+            }}
+
+            /* Hidden preview text */
+            .preview-text {{
+                display: none;
+                font-size: 0;
+                color: transparent;
+                line-height: 0;
+                max-height: 0;
+                mso-hide: all; /* Hide in Outlook */
+            }}
+        </style>
+    </head>
+    <body>
+        <!-- Hidden preview text -->
+        <span class="preview-text">Here's your Miami Racket Club username.</span>
+
+        <div class="email-container">
+            <div class="email-header">
+                <img src="{logo_url}" alt="Miami Racket Club Logo">
+            </div>
+            <div class="email-content">
+                <h3>Miami Racket Club</h3>
+                <p>Hi, {user.first_name or 'there'},</p>
+                <p>Your username is: <strong>{user.username}</strong></p>
+                <p>If you did not request this information, please ignore this email.</p>
+            </div>
+            <div class="footer">
+                <p>See you on court!</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    '''
+
+    # Send the email
+    recipient_list = [user.email]
+    send_mail(subject, subject, from_email, recipient_list, html_message=html_message)
+
+def username_retrieval_done(request):
+    return render(request, 'registration/username_retrieval_done.html')
+
+def username_retrieval_done(request):
+    return render(request, 'registration/username_retrieval_done.html')
