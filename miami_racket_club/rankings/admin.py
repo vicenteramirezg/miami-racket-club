@@ -3,7 +3,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from email.utils import formataddr
 from email.header import Header
-from .models import Player, Match
+from .models import Player, Match, ELOHistory
 
 class PlayerAdmin(admin.ModelAdmin):
     list_display = ('user', 'is_approved', 'user__first_name', 'user__last_name')
@@ -154,5 +154,12 @@ class PlayerAdmin(admin.ModelAdmin):
         recipient_list = [user.email]
         send_mail(subject, subject, from_email, recipient_list, html_message=html_message)
 
+class EloHistoryAdmin(admin.ModelAdmin):
+    list_display = ('player', 'match', 'elo_rating', 'date', 'submitted_at')  # Customize fields to display
+    list_filter = ('player', 'match', 'submitted_at')  # Add filters
+    search_fields = ('player__username', 'match__id')  # Add search functionality
+    ordering = ('-submitted_at',)  # Default sorting
+
 admin.site.register(Player, PlayerAdmin)
+admin.site.register(ELOHistory, EloHistoryAdmin)
 admin.site.register(Match)
