@@ -474,7 +474,7 @@ class CustomLoginView(LoginView):
 @approved_required   
 def player_directory(request):
     # Get all players ordered alphabetically by default
-    players = Player.objects.order_by('first_name', 'last_name')
+    players = Player.objects.filter(is_approved=True).order_by('first_name', 'last_name')
 
     # Initialize filter variables
     neighborhoods = request.GET.getlist('neighborhood')  # Multiple neighborhoods can be selected
