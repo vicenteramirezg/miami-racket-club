@@ -1,6 +1,7 @@
 from django.db import models, transaction
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 from .utils import calculate_dominance_factor, adjust_k_factor
 import json
 
@@ -78,6 +79,10 @@ class Player(models.Model):
 class Match(models.Model):
     winner = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="won_matches")
     loser = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="lost_matches")
+    winner_elo_before = models.IntegerField(null=True, blank=True)
+    loser_elo_before = models.IntegerField(null=True, blank=True)
+    winner_elo_after = models.IntegerField(null=True, blank=True)
+    loser_elo_after = models.IntegerField(null=True, blank=True)
     set_scores = models.JSONField()
     date = models.DateField(auto_now_add=False)  # Allow custom dates
     notes = models.TextField(blank=True, null=True)  # Optional notes
@@ -85,80 +90,131 @@ class Match(models.Model):
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="submitted_matches")
     submitted_at = models.DateTimeField(auto_now_add=True)  # Timestamp when the match is submitted
 
+    is_deleted = models.BooleanField(default=False)  # Soft delete field
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.save()
+
     def __str__(self):
         return f"{self.winner} vs {self.loser} ({self.clean_score()})"
     
     def clean_score(self):
         """Formats set_scores into a readable string like '6-1 4-6 6-0'."""
         return "  ".join(f"{set_score[0]}-{set_score[1]}" for set_score in self.set_scores)
-
+    
     def save(self, *args, **kwargs):
+        """
+        Saves the match and calculates ELO ratings unless skip_validation or skip_elo_calculation is True.
+        """
+        skip_validation = kwargs.pop('skip_validation', False)  # Skip validation if True
+        skip_elo_calculation = kwargs.pop('skip_elo_calculation', False)  # Skip ELO calculation if True
+
         with transaction.atomic():
-            # Check if the match date is in the future
-            if self.date > timezone.now().date():
-                raise ValueError("The match date cannot be in the future.")
-            
-            # Check if winner and loser are the same player
-            if self.winner == self.loser:
-                raise ValueError("The winner and loser cannot be the same player.")
-            
-            # Validate each set score
-            for set_score in self.set_scores:
-                if set_score not in VALID_SET_SCORES:
-                    raise ValueError(f"Invalid set score: {set_score}. Valid scores are: {VALID_SET_SCORES}.")
-            
-            # Validate set scores
-            winner_sets = 0
-            loser_sets = 0
-            for set_score in self.set_scores:
-                if set_score[0] > set_score[1]:
-                    winner_sets += 1
-                else:
-                    loser_sets += 1
+            if not skip_validation:
+                # Check if the match date is in the future
+                if self.date > timezone.now().date():
+                    raise ValidationError("The match date cannot be in the future.")
+                
+                # Check if winner and loser are the same player
+                if self.winner == self.loser:
+                    raise ValidationError("The winner and loser cannot be the same player.")
+                
+                # Validate each set score
+                for set_score in self.set_scores:
+                    if set_score not in VALID_SET_SCORES:
+                        raise ValidationError(f"Invalid set score: {set_score}. Valid scores are: {VALID_SET_SCORES}.")
+                
+                # Validate set scores
+                winner_sets = 0
+                loser_sets = 0
+                for set_score in self.set_scores:
+                    if set_score[0] > set_score[1]:
+                        winner_sets += 1
+                    else:
+                        loser_sets += 1
 
-            if winner_sets <= loser_sets:
-                raise ValueError("The winner must win more sets than the loser.")
-            elif winner_sets == loser_sets:
-                raise ValueError("The match cannot end in a tie. One player must win more sets than the other.")
+                if winner_sets <= loser_sets:
+                    raise ValidationError("The winner must win more sets than the loser.")
+                elif winner_sets == loser_sets:
+                    raise ValidationError("The match cannot end in a tie. One player must win more sets than the other.")
 
-            # Calculate dominance factor
-        dominance_factor = calculate_dominance_factor(self.set_scores)
+            if not skip_elo_calculation:
+                # Capture ELO ratings before the match
+                self.winner_elo_before = self.winner.elo_rating
+                self.loser_elo_before = self.loser.elo_rating
 
-        # Base K-factor
-        base_k = 32
+                # Calculate dominance factor
+                dominance_factor = calculate_dominance_factor(self.set_scores)
 
-        # Adjust K-factor based on dominance
-        adjusted_k = adjust_k_factor(base_k, dominance_factor)
+                # Base K-factor
+                base_k = 32
 
-        # Calculate new ELO ratings
-        winner_rating = self.winner.elo_rating
-        loser_rating = self.loser.elo_rating
+                # Adjust K-factor based on dominance
+                adjusted_k = adjust_k_factor(base_k, dominance_factor)
 
-        # Expected scores
-        expected_winner = 1 / (1 + 10 ** ((loser_rating - winner_rating) / 400))
-        expected_loser = 1 / (1 + 10 ** ((winner_rating - loser_rating) / 400))
+                # Calculate new ELO ratings
+                winner_rating = self.winner.elo_rating
+                loser_rating = self.loser.elo_rating
 
-        # New ratings
-        new_winner_rating = round(winner_rating + adjusted_k * (1 - expected_winner))
-        new_loser_rating = round(loser_rating + adjusted_k * (0 - expected_loser))
+                # Expected scores
+                expected_winner = 1 / (1 + 10 ** ((loser_rating - winner_rating) / 400))
+                expected_loser = 1 / (1 + 10 ** ((winner_rating - loser_rating) / 400))
 
-        # Update player ratings
-        self.winner.elo_rating = new_winner_rating
-        self.loser.elo_rating = new_loser_rating
+                # New ratings
+                new_winner_rating = round(winner_rating + adjusted_k * (1 - expected_winner))
+                new_loser_rating = round(loser_rating + adjusted_k * (0 - expected_loser))
 
-        # Save the updated player ratings to the database
-        self.winner.save()
-        self.loser.save()
+                # Update player ratings
+                self.winner.elo_rating = new_winner_rating
+                self.loser.elo_rating = new_loser_rating
 
-        # Save the match
-        super().save(*args, **kwargs)
+                # Capture ELO ratings after the match
+                self.winner_elo_after = new_winner_rating
+                self.loser_elo_after = new_loser_rating
 
-        # Log ELO changes using the match date
-        match_datetime = timezone.make_aware(timezone.datetime.combine(self.date, timezone.datetime.min.time()))
-        
-        # Creating ELOHistory and linking to the match
-        ELOHistory.objects.create(player=self.winner, elo_rating=new_winner_rating, date=match_datetime, match=self)
-        ELOHistory.objects.create(player=self.loser, elo_rating=new_loser_rating, date=match_datetime, match=self)
+                # Save the updated player ratings to the database
+                self.winner.save()
+                self.loser.save()
+
+            # Save the match
+            super().save(*args, **kwargs)
+
+            if not skip_elo_calculation:
+                # Log ELO changes using the match date
+                match_datetime = timezone.make_aware(timezone.datetime.combine(self.date, timezone.datetime.min.time()))
+                
+                # Creating ELOHistory and linking to the match
+                ELOHistory.objects.create(player=self.winner, elo_rating=new_winner_rating, date=match_datetime, match=self, is_valid=True)
+                ELOHistory.objects.create(player=self.loser, elo_rating=new_loser_rating, date=match_datetime, match=self, is_valid=True)
+
+    def revert_match(self):
+        """
+        Reverts the match by restoring the ELO ratings of the winner and loser
+        and soft-deleting the match.
+        """
+        with transaction.atomic():
+            print(f"Before Reversion - Winner ELO: {self.winner.elo_rating}, Loser ELO: {self.loser.elo_rating}")  # Debug
+            print(f"Reverting to - Winner ELO Before: {self.winner_elo_before}, Loser ELO Before: {self.loser_elo_before}")  # Debug
+
+            # Revert ELO ratings
+            self.winner.elo_rating = self.winner_elo_before
+            self.loser.elo_rating = self.loser_elo_before
+
+            # Save the updated player ratings
+            self.winner.save()
+            self.loser.save()
+
+            print(f"After Reversion - Winner ELO: {self.winner.elo_rating}, Loser ELO: {self.loser.elo_rating}")  # Debug
+
+            # Soft delete the match
+            self.is_deleted = True
+
+            # Save the match without validation or ELO calculation
+            self.save(skip_validation=True, skip_elo_calculation=True)
+
+            # Mark the corresponding EloHistory entries as invalid
+            ELOHistory.objects.filter(match=self).update(is_valid=False)
 
 class ELOHistory(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history')
@@ -166,6 +222,7 @@ class ELOHistory(models.Model):
     elo_rating = models.IntegerField()
     date = models.DateTimeField()  # Match date (not auto-updating)
     submitted_at = models.DateTimeField(default=timezone.now)  # Track when the log was recorded
+    is_valid = models.BooleanField(default=True)  # Add this field
 
     def __str__(self):
         return f"{self.player.user.username} - {self.elo_rating} on {self.date}"

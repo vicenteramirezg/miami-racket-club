@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from email.utils import formataddr
@@ -160,6 +161,40 @@ class EloHistoryAdmin(admin.ModelAdmin):
     search_fields = ('player__username', 'match__id')  # Add search functionality
     ordering = ('-submitted_at',)  # Default sorting
 
+@admin.action(description='Revert selected matches and restore ELO ratings')
+def revert_matches(modeladmin, request, queryset):
+    """
+    Custom admin action to revert selected matches and restore ELO ratings.
+    """
+    for match in queryset:
+        if not match.is_deleted:
+            match.revert_match()
+            messages.success(request, f'Match {match.id} reverted successfully.')
+        else:
+            messages.warning(request, f'Match {match.id} is already reverted.')
+
+class MatchAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'winner', 'loser', 'winner_elo_before', 'loser_elo_before',
+        'winner_elo_after', 'loser_elo_after', 'set_scores', 'date', 'submitted_by', 'submitted_at', 'is_deleted'
+    )  # Display all fields
+    list_filter = ('is_deleted', 'date', 'submitted_at')  # Add filters
+    search_fields = ('winner__username', 'loser__username')  # Add search functionality
+    actions = [revert_matches]  # Add the custom action
+    ordering = ('-submitted_at',)  # Default sorting
+    fieldsets = (
+        (None, {
+            'fields': ('winner', 'loser', 'set_scores', 'date', 'notes', 'is_deleted')
+        }),
+        ('ELO Ratings', {
+            'fields': ('winner_elo_before', 'loser_elo_before', 'winner_elo_after', 'loser_elo_after')
+        }),
+        ('Submission Details', {
+            'fields': ('submitted_by', 'submitted_at')
+        }),
+    )
+    readonly_fields = ('submitted_at', 'winner_elo_before', 'loser_elo_before', 'winner_elo_after', 'loser_elo_after')  # Make these fields read-only
+
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(ELOHistory, EloHistoryAdmin)
-admin.site.register(Match)
+admin.site.register(Match, MatchAdmin)

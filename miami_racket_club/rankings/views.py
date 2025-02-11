@@ -203,7 +203,8 @@ def send_match_notification(match):
 
 @approved_required
 def home(request):
-    recent_matches = Match.objects.order_by('-date')[:5]  # Get the 5 most recent matches
+    # Fetch recent matches that are not soft-deleted
+    recent_matches = Match.objects.filter(is_deleted=False).order_by('-date')[:10]  # Adjust the number as needed
     context = {
         'recent_matches': recent_matches,
     }
@@ -213,7 +214,7 @@ def home(request):
 @approved_required
 def profile(request, username):
     player = get_object_or_404(Player, user__username=username)
-    matches = Match.objects.filter(winner=player) | Match.objects.filter(loser=player)
+    matches = Match.objects.filter((Q(winner=player) | Q(loser=player)) & Q(is_deleted=False)).order_by('-date')  # Order by date (most recent first)
     matches = matches.order_by('-date')  # Show most recent matches first
 
     # Fetch ELO history and ensure only the latest entry for each submitted_at date is included
