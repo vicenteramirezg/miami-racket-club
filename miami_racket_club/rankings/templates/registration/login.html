@@ -39,10 +39,7 @@
 
                 <!-- Forgot Password and Username Links -->
                 <p class="mt-2 text-center" style="color: #104730;"> <!-- Dark green text -->
-                    <a href="{% url 'password_reset' %}" style="color: #c8c097;">Forgot your password?</a> <!-- Light beige link -->
-                </p>
-                <p class="mt-2 text-center" style="color: #104730;"> <!-- Dark green text -->
-                    <a href="{% url 'username_retrieval' %}" style="color: #c8c097;">Forgot your username?</a> <!-- Light beige link -->
+                    Forgot your <a href="{% url 'username_retrieval' %}" style="color: #c8c097;">username</a> / <a href="{% url 'password_reset' %}" style="color: #c8c097;">password</a>?<!-- Light beige link -->
                 </p>
             </div>
         </div>
