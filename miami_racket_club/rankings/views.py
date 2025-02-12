@@ -44,7 +44,7 @@ def chatbot(request):
 
         # Prepare context for the current player
         context = f"Player: {player.user.first_name} {player.user.last_name}\n"
-        context += f"Current ELO Rating: {player.elo_rating}\n"
+        context += f"Current MRC Rating: {player.elo_rating}\n"
 
         # Fetch the player's past matches (both as winner and loser)
         matches_won = Match.objects.filter(winner=player)
@@ -69,9 +69,9 @@ def chatbot(request):
 
         # Fetch all players (friends) and their ELO ratings
         all_players = Player.objects.all().exclude(id=player.id)  # Exclude the current player
-        context += "\nOther Players and Their ELO Ratings:\n"
+        context += "\nOther Players and Their MRC Ratings:\n"
         for friend in all_players:
-            context += f"- {friend.user.first_name} {friend.user.last_name}: ELO {friend.elo_rating}\n"
+            context += f"- {friend.user.first_name} {friend.user.last_name}: MRC Rating {friend.elo_rating}\n"
 
         # Fetch recent matches for all players (friends)
         context += "\nRecent Matches for Other Players:\n"
