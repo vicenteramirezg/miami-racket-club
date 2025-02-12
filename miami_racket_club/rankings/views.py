@@ -42,7 +42,7 @@ def chatbot(request):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",  # Use GPT-3.5 or GPT-4
             messages=[
-                {"role": "system", "content": "You are a helpful tennis coach and assistant."},
+                {"role": "system", "content": "You are a helpful tennis coach and assistant. You also know a lot about tennis history, Miami tennis facilities and The Miami Racket Club (https://www.themiamiracketclub.com/)(https://www.instagram.com/miami_racketclub/)."},
                 {"role": "user", "content": user_message},
             ]
         )
