@@ -215,10 +215,9 @@ def home(request):
 def profile(request, username):
     player = get_object_or_404(Player, user__username=username)
     matches = Match.objects.filter((Q(winner=player) | Q(loser=player)) & Q(is_deleted=False)).order_by('-date')  # Order by date (most recent first)
-    matches = matches.order_by('-date')  # Show most recent matches first
 
-    # Fetch ELO history and ensure only the latest entry for each submitted_at date is included
-    elo_history = player.elo_history.order_by('submitted_at')
+    # Fetch ELO history where is_valid=True
+    elo_history = ELOHistory.objects.filter(player=player, is_valid=True).order_by('submitted_at')
 
     # Calculate statistics
     matches_played = matches.count()
@@ -251,9 +250,6 @@ def profile(request, username):
     match_win_percentage = (matches_won / matches_played * 100) if matches_played > 0 else 0
     set_win_percentage = (sets_won / sets_played * 100) if sets_played > 0 else 0
     game_win_percentage = (games_won / games_played * 100) if games_played > 0 else 0
-
-    # Get ELO history
-    elo_history = player.elo_history.order_by('submitted_at')
 
     # Calculate Current Streak (most recent wins until a loss)
     current_streak = 0
