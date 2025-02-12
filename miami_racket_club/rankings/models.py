@@ -42,6 +42,7 @@ class Player(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True)  # US phone numbers only
     created_at = models.DateTimeField(default=timezone.now)  # Automatically set when the player is created
     is_approved = models.BooleanField(default=False)  # Tracks admin approval
+    last_activity = models.DateTimeField(default=timezone.now)
 
     def matches_played(self):
         return self.matches_as_winner.count() + self.matches_as_loser.count()
@@ -172,6 +173,10 @@ class Match(models.Model):
                 # Capture ELO ratings after the match
                 self.winner_elo_after = new_winner_rating
                 self.loser_elo_after = new_loser_rating
+
+                # Update the last_activity field for both players
+                self.winner.last_activity = timezone.now()
+                self.loser.last_activity = timezone.now()
 
                 # Save the updated player ratings to the database
                 self.winner.save()
