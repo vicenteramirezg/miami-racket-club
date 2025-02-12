@@ -86,6 +86,13 @@ def frange(start, stop, step):
         yield start
         start += step
 
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
+from django.utils.text import slugify
+from rankings.models import Player  # Import your Player model
+from .models import User  # Import your User model
+
 class CustomSignUpForm(UserCreationForm):
     email = forms.EmailField(required=True, label="Email")
     first_name = forms.CharField(max_length=50, required=True, label="First Name")
@@ -127,6 +134,15 @@ class CustomSignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2', 'usta_rating', 'neighborhood', 'phone_number', 'agree_to_terms')
+
+    def clean_username(self):
+        """
+        Normalize the username to lowercase to ensure case-insensitive uniqueness.
+        """
+        username = self.cleaned_data.get('username')
+        if username:
+            username = username.lower()  # Normalize to lowercase
+        return username
 
     def save(self, commit=True):
         # Save the User instance first

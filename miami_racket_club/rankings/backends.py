@@ -6,20 +6,32 @@ User = get_user_model()
 
 class ApprovedUserBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
-        # First, authenticate the user with the default ModelBackend logic
-        user = super().authenticate(request, username=username, password=password, **kwargs)
-        
+        # Perform a case-insensitive lookup for the username
+        if username is None:
+            username = kwargs.get(User.USERNAME_FIELD)
+
+        try:
+            # Case-insensitive lookup for the username
+            user = User.objects.get(username__iexact=username)
+        except User.DoesNotExist:
+            # Run the default password hasher to prevent timing attacks
+            User().set_password(password)
+            return None
+
+        # Check the password (case-sensitive)
+        if not user.check_password(password):
+            return None
+
         # Check if the user exists and if the associated Player instance is approved
-        if user:
-            try:
-                player = user.player  # Get the Player instance associated with the user
-                if not player.is_approved:
-                    # If not approved, return None to deny login
-                    return None
-            except Player.DoesNotExist:
-                # In case the user does not have an associated Player, deny login
+        try:
+            player = user.player  # Get the Player instance associated with the user
+            if not player.is_approved:
+                # If not approved, return None to deny login
                 return None
-        
+        except Player.DoesNotExist:
+            # In case the user does not have an associated Player, deny login
+            return None
+
         return user
 
     def get_user(self, user_id):
