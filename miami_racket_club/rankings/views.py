@@ -37,13 +37,44 @@ def chatbot(request):
     """Handle chatbot API requests."""
     if request.method == 'POST':
         user_message = request.POST.get('message', '')
+        user = request.user  # Assuming the user is authenticated
+
+        # Fetch the player associated with the current user
+        player = get_object_or_404(Player, user=user)
+
+        # Fetch the player's past matches (both as winner and loser)
+        matches_won = Match.objects.filter(winner=player)
+        matches_lost = Match.objects.filter(loser=player)
+        matches = matches_won | matches_lost  # Combine both querysets
+        matches = matches.order_by('-date')[:5]  # Fetch the 5 most recent matches
+
+        # Prepare context from the database
+        context = f"Player: {player.user.first_name} {player.user.last_name}\n"
+        context += f"Current ELO Rating: {player.elo_rating}\n"
+        context += "Recent Matches:\n"
+        for match in matches:
+            if match.winner == player:
+                result = "Win"
+                opponent = match.loser.user.first_name + " " + match.loser.user.last_name
+            else:
+                result = "Loss"
+                opponent = match.winner.user.first_name + " " + match.winner.user.last_name
+
+            # Format the set scores
+            set_scores = match.clean_score
+            score_summary = set_scores
+
+            context += f"- vs {opponent}: {result} (Scores: {score_summary})\n"
+
+        # Combine the user's message with the context
+        full_message = f"{context}\n\nUser: {user_message}"
 
         # Send the request to OpenAI API
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",  # Use GPT-3.5 or GPT-4
             messages=[
-                {"role": "system", "content": "You are a helpful tennis coach and assistant. You also know a lot about tennis history, Miami tennis facilities and The Miami Racket Club (https://www.themiamiracketclub.com/)(https://www.instagram.com/miami_racketclub/)."},
-                {"role": "user", "content": user_message},
+                {"role": "system", "content": "You are a helpful tennis coach and assistant. You also know a lot about tennis history, Miami tennis facilities, and The Miami Racket Club (https://www.themiamiracketclub.com/) (https://www.instagram.com/miami_racketclub/)."},
+                {"role": "user", "content": full_message},
             ]
         )
 
