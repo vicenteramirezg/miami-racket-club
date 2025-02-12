@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
-from .views import CustomLoginView, CustomPasswordResetView
+from .views import CustomLoginView, CustomPasswordResetView, chatbot, chatbot_page
 
 
 urlpatterns = [
@@ -9,6 +9,8 @@ urlpatterns = [
     path('accounts/login/', CustomLoginView.as_view(), name='login'),
     path('player-directory/', views.player_directory, name='player_directory'),
     path('leaderboard/', views.leaderboard, name='leaderboard'),
+    path('chatbot/', chatbot_page, name='chatbot_page'),  # For rendering the chatbot HTML page
+    path('chatbot/api/', chatbot, name='chatbot_api'),
     path('password-reset/', CustomPasswordResetView.as_view(  # Use the custom view
         template_name='registration/password_reset_form.html',
         email_template_name='registration/password_reset_email.html',  # Plain text fallback

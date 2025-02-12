@@ -19,6 +19,39 @@ from email.utils import formataddr
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from openai import OpenAI
+import os
+
+# Initialize the OpenAI client
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')  # Load API key from environment variables
+client = OpenAI(api_key=OPENAI_API_KEY)
+
+def chatbot_page(request):
+    """Render the chatbot HTML page."""
+    return render(request, 'rankings/chatbot.html')
+
+@csrf_exempt
+def chatbot(request):
+    """Handle chatbot API requests."""
+    if request.method == 'POST':
+        user_message = request.POST.get('message', '')
+
+        # Send the request to OpenAI API
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",  # Use GPT-3.5 or GPT-4
+            messages=[
+                {"role": "system", "content": "You are a helpful tennis coach and assistant."},
+                {"role": "user", "content": user_message},
+            ]
+        )
+
+        # Extract the AI's reply
+        ai_reply = response.choices[0].message.content
+        return JsonResponse({'reply': ai_reply})
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 @login_required
 @approved_required

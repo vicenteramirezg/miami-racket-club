@@ -1,0 +1,73 @@
+{% extends 'rankings/base.html' %}
+
+{% block content %}
+<div class="chatbot-page">
+    <div class="container">
+        <h1 class="my-4 text-center" style="color: #c8c097;">Tennis Coach Chatbot</h1>  <!-- Light beige title -->
+
+        <!-- Chat Container with Rounded Edges and Narrower Width -->
+        <div class="border p-4 rounded" style="max-width: 800px; margin: 0 auto; background-color: #4c7563; border-color: #c8c097;"> <!-- Light green background, beige border -->
+            <!-- Chat Log -->
+            <div id="chatlog" style="height: 300px; overflow-y: auto; border: 1px solid #c8c097; padding: 10px; margin-bottom: 10px; background-color: #fff; border-radius: 5px; color: #104730;">
+                <!-- Chat messages will appear here -->
+            </div>
+
+            <!-- Input and Send Button -->
+            <div class="input-group">
+                <input type="text" id="userinput" class="form-control" placeholder="Ask me something about tennis..." style="border: 1px solid #c8c097; border-radius: 5px; color: #104730;">
+                <button id="sendbutton" class="btn" style="background-color: #c8c097; color: #104730; border: 1px solid #c8c097; border-radius: 5px; margin-left: 10px;">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include marked.js for markdown rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<!-- JavaScript for Chatbot Interaction -->
+<script>
+    document.getElementById('sendbutton').addEventListener('click', function() {
+        const userMessage = document.getElementById('userinput').value;
+        const chatlog = document.getElementById('chatlog');
+
+        // Display the user's message in the chat log
+        chatlog.innerHTML += `<div><strong>You:</strong> ${userMessage}</div>`;
+
+        // Clear the input field
+        document.getElementById('userinput').value = '';
+
+        // Send the message to the Django backend
+        fetch('/chatbot/api/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}',  // Include CSRF token for Django
+            },
+            body: `message=${encodeURIComponent(userMessage)}`,
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Convert markdown to HTML using marked.js
+            const botReply = marked.parse(data.reply);
+
+            // Display the chatbot's reply in the chat log
+            chatlog.innerHTML += `<div><strong>Bot:</strong> ${botReply}</div>`;
+
+            // Scroll to the bottom of the chat log
+            chatlog.scrollTop = chatlog.scrollHeight;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            chatlog.innerHTML += `<div><strong>Bot:</strong> Sorry, something went wrong. Please try again.</div>`;
+        });
+    });
+
+    // Allow pressing "Enter" to send the message
+    document.getElementById('userinput').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('sendbutton').click();
+        }
+    });
+</script>
+{% endblock %}
