@@ -50,7 +50,7 @@ def chatbot(request):
         matches_won = Match.objects.filter(winner=player)
         matches_lost = Match.objects.filter(loser=player)
         matches = matches_won | matches_lost  # Combine both querysets
-        matches = matches.order_by('-date')[:5]  # Fetch the 5 most recent matches
+        matches = matches.order_by('-date')[:10]  # Fetch the 5 most recent matches
 
         context += "Your Recent Matches:\n"
         for match in matches:
