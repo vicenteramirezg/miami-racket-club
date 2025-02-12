@@ -193,7 +193,7 @@ class MatchAdmin(admin.ModelAdmin):
             'fields': ('submitted_by', 'submitted_at')
         }),
     )
-    readonly_fields = ('submitted_at', 'winner_elo_before', 'loser_elo_before', 'winner_elo_after', 'loser_elo_after')  # Make these fields read-only
+    readonly_fields = ('submitted_at')  # Make these fields read-only
 
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(ELOHistory, EloHistoryAdmin)
