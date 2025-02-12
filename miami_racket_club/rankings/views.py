@@ -42,16 +42,17 @@ def chatbot(request):
         # Fetch the player associated with the current user
         player = get_object_or_404(Player, user=user)
 
+        # Prepare context for the current player
+        context = f"Player: {player.user.first_name} {player.user.last_name}\n"
+        context += f"Current ELO Rating: {player.elo_rating}\n"
+
         # Fetch the player's past matches (both as winner and loser)
         matches_won = Match.objects.filter(winner=player)
         matches_lost = Match.objects.filter(loser=player)
         matches = matches_won | matches_lost  # Combine both querysets
         matches = matches.order_by('-date')[:5]  # Fetch the 5 most recent matches
 
-        # Prepare context from the database
-        context = f"Player: {player.user.first_name} {player.user.last_name}\n"
-        context += f"Current ELO Rating: {player.elo_rating}\n"
-        context += "Recent Matches:\n"
+        context += "Your Recent Matches:\n"
         for match in matches:
             if match.winner == player:
                 result = "Win"
@@ -65,6 +66,21 @@ def chatbot(request):
             score_summary = set_scores
 
             context += f"- vs {opponent}: {result} (Scores: {score_summary})\n"
+
+        # Fetch all players (friends) and their ELO ratings
+        all_players = Player.objects.all().exclude(id=player.id)  # Exclude the current player
+        context += "\nOther Players and Their ELO Ratings:\n"
+        for friend in all_players:
+            context += f"- {friend.user.first_name} {friend.user.last_name}: ELO {friend.elo_rating}\n"
+
+        # Fetch recent matches for all players (friends)
+        context += "\nRecent Matches for Other Players:\n"
+        recent_matches = Match.objects.all().order_by('-date')[:10]  # Fetch the 10 most recent matches
+        for match in recent_matches:
+            winner_name = match.winner.user.first_name + " " + match.winner.user.last_name
+            loser_name = match.loser.user.first_name + " " + match.loser.user.last_name
+            set_scores = match.clean_score
+            context += f"- {winner_name} vs {loser_name}: {set_scores}\n"
 
         # Combine the user's message with the context
         full_message = f"{context}\n\nUser: {user_message}"
