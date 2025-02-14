@@ -31,7 +31,8 @@ class Player(models.Model):
         ('Design District', 'Design District'),
         ('Kendall', 'Kendall'),
         ('Weston', 'Weston'),
-        ('Fort Lauderdale', 'Fort Lauderdale')
+        ('Fort Lauderdale', 'Fort Lauderdale'),
+        ('Shenandoah', 'Shenandoah')
     ], key=lambda x: x[1])
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50, blank=True, null=True)
