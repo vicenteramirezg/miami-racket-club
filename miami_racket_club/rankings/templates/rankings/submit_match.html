@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="my-4 text-center" style="color: #c8c097;">Submit Match</h1> <!-- Light beige title -->
+    <h1 class="my-4 text-center" style="color: #c8c097;">Submit Singles Match</h1>
 
     <!-- Error Message Section -->
     {% if form.errors %}
@@ -22,46 +22,37 @@
         </div>
     {% endif %}
 
-    <form method="post">
+    <form method="post" action="{% url 'submit_match' %}">
         {% csrf_token %}
-
-        <!-- Scoreboard & Match Details -->
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <!-- Match Form -->
-                <div class="border p-4 rounded" style="background-color: #4c7563; border-color: #c8c097;"> <!-- Light green background, beige border -->
-                    <div class="text-center fw-bold mb-3" style="color: #c8c097;">Match Score</div> <!-- Light beige title -->
-                    
-                    <!-- Scoreboard Header -->
-                    <div class="row text-center fw-bold mb-2" style="color: #c8c097;"> <!-- Light beige text -->
-                        <div class="col-3">Player</div>
-                        <div class="col-3">Set 1</div>
-                        <div class="col-3">Set 2</div>
-                        <div class="col-3">Set 3</div>
-                    </div>
+                <div class="border p-4 rounded" style="background-color: #4c7563; border-color: #c8c097;">
+                    <div class="text-center fw-bold mb-3" style="color: #c8c097;">Match Score</div>
 
-                    <!-- Winner Row -->
-                    <div class="row text-center align-items-center mb-2">
-                        <div class="col-3 d-flex flex-column align-items-center">
-                            <span class="badge bg-success mb-1">Winner</span>
-                            {{ form.winner }}
+                    <!-- Singles Form -->
+                    <div id="singlesForm">
+                        <div class="row text-center align-items-center mb-2">
+                            <div class="col-3 d-flex flex-column align-items-center">
+                                <span class="badge bg-success mb-1">Winner</span>
+                                {{ form.winner }}
+                            </div>
+                            <div class="col-3">{{ form.winner_games_set1 }}</div>
+                            <div class="col-3">{{ form.winner_games_set2 }}</div>
+                            <div class="col-3">{{ form.winner_games_set3 }}</div>
                         </div>
-                        <div class="col-3">{{ form.winner_games_set1 }}</div>
-                        <div class="col-3">{{ form.winner_games_set2 }}</div>
-                        <div class="col-3">{{ form.winner_games_set3 }}</div>
-                    </div>
 
-                    <hr class="my-2">
+                        <hr class="my-2">
 
-                    <!-- Loser Row -->
-                    <div class="row text-center align-items-center mb-3">
-                        <div class="col-3 d-flex flex-column align-items-center">
-                            <span class="badge bg-danger mb-1">Loser</span>
-                            {{ form.loser }}
+                        <div class="row text-center align-items-center mb-3">
+                            <div class="col-3 d-flex flex-column align-items-center">
+                                <span class="badge bg-danger mb-1">Loser</span>
+                                {{ form.loser }}
+                            </div>
+                            <div class="col-3">{{ form.loser_games_set1 }}</div>
+                            <div class="col-3">{{ form.loser_games_set2 }}</div>
+                            <div class="col-3">{{ form.loser_games_set3 }}</div>
                         </div>
-                        <div class="col-3">{{ form.loser_games_set1 }}</div>
-                        <div class="col-3">{{ form.loser_games_set2 }}</div>
-                        <div class="col-3">{{ form.loser_games_set3 }}</div>
                     </div>
 
                     <hr class="my-3">
@@ -69,18 +60,18 @@
                     <!-- Date & Notes Inside Border -->
                     <div class="row">
                         <div class="col-md-6">
-                            <label for="{{ form.date.id_for_label }}" class="form-label" style="color: #c8c097;">Match Date</label> <!-- Light beige text -->
+                            <label for="{{ form.date.id_for_label }}" class="form-label" style="color: #c8c097;">Match Date</label>
                             {{ form.date }}
                         </div>
                         <div class="col-md-12 mt-3">
-                            <label for="{{ form.notes.id_for_label }}" class="form-label" style="color: #c8c097;">Notes</label> <!-- Light beige text -->
+                            <label for="{{ form.notes.id_for_label }}" class="form-label" style="color: #c8c097;">Notes</label>
                             {{ form.notes }}
                         </div>
                     </div>
 
                     <!-- Submit Button Inside the Bordered Container -->
                     <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg" style="background-color: #c8c097; border-color: #c8c097; color: #104730;">Submit Match</button> <!-- Custom button style -->
+                        <button type="submit" class="btn btn-primary btn-lg" style="background-color: #c8c097; border-color: #c8c097; color: #104730;">Submit Match</button>
                     </div>
                 </div>
             </div>

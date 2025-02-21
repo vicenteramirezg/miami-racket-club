@@ -5,7 +5,8 @@ from .views import CustomLoginView, CustomPasswordResetView
 
 
 urlpatterns = [
-    path('submit/', views.submit_match, name='submit_match'),
+    path('submit-match/', views.submit_match, name='submit_match'),
+    path('submit-doubles-match/', views.submit_doubles_match, name='submit_doubles_match'),
     path('accounts/login/', CustomLoginView.as_view(), name='login'),
     path('player-directory/', views.player_directory, name='player_directory'),
     path('leaderboard/', views.leaderboard, name='leaderboard'),

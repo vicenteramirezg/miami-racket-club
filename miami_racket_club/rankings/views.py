@@ -10,8 +10,8 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
-from .forms import MatchForm, CustomSignUpForm, UsernameRetrievalForm  # Ensure this import is correct
-from .models import Player, Match, ELOHistory
+from .forms import MatchForm, CustomSignUpForm, UsernameRetrievalForm, MatchDoublesForm
+from .models import Player, Match, ELOHistory, MatchDoubles, ELOHistoryDoubles
 from .decorators import approved_required
 from django.contrib.auth.decorators import login_required
 from email.header import Header
@@ -22,18 +22,80 @@ from django.utils.html import strip_tags
 
 @login_required
 @approved_required
+def submit_doubles_match(request):
+    if request.method == 'POST':
+        form = MatchDoublesForm(request.POST)
+        if form.is_valid():
+            match = form.save(commit=False)
+            match.submitted_by = request.user
+            match.save()
+
+            # Create ELOHistoryDoubles records for the two winners and two losers
+            winner1 = form.cleaned_data['winner1']
+            winner2 = form.cleaned_data['winner2']
+            loser1 = form.cleaned_data['loser1']
+            loser2 = form.cleaned_data['loser2']
+
+            # Save ELOHistoryDoubles for the winners and losers
+            # Note: You may want to calculate the ELO ratings based on your logic
+            for player in [winner1, winner2]:
+                ELOHistoryDoubles.objects.create(
+                    player=player,
+                    match=match,
+                    elo_rating=player.elo_rating,  # Adjust based on how you calculate the rating
+                    date=match.date,
+                )
+
+            for player in [loser1, loser2]:
+                ELOHistoryDoubles.objects.create(
+                    player=player,
+                    match=match,
+                    elo_rating=player.elo_rating,  # Adjust based on how you calculate the rating
+                    date=match.date,
+                )
+
+            send_match_notification(match)
+            return redirect('leaderboard')
+    else:
+        form = MatchDoublesForm()
+
+    return render(request, 'rankings/submit_doubles_match.html', {'form': form})
+
+@login_required
+@approved_required
 def submit_match(request):
     if request.method == 'POST':
         form = MatchForm(request.POST)
         if form.is_valid():
             match = form.save(commit=False)
-            match.set_scores = form.cleaned_data['set_scores']
-            match.submitted_by = request.user  # Set the user who submitted the match
+            match.submitted_by = request.user
             match.save()
-            send_match_notification(match)  # Send notification
+
+            # Create ELOHistory records for the winner and loser
+            winner = form.cleaned_data['winner']
+            loser = form.cleaned_data['loser']
+
+            # Save ELOHistory for the winner and loser
+            # Note: You may want to calculate the ELO ratings based on your logic
+            ELOHistory.objects.create(
+                player=winner,
+                match=match,
+                elo_rating=winner.elo_rating,  # Adjust based on how you calculate the rating
+                date=match.date,
+            )
+
+            ELOHistory.objects.create(
+                player=loser,
+                match=match,
+                elo_rating=loser.elo_rating,  # Adjust based on how you calculate the rating
+                date=match.date,
+            )
+
+            send_match_notification(match)
             return redirect('leaderboard')
     else:
         form = MatchForm()
+
     return render(request, 'rankings/submit_match.html', {'form': form})
 
 @login_required
@@ -218,6 +280,7 @@ def profile(request, username):
 
     # Fetch ELO history where is_valid=True
     elo_history = ELOHistory.objects.filter(player=player, is_valid=True).order_by('submitted_at')
+    elo_history_doubles = ELOHistoryDoubles.objects.filter(player=player, is_valid=True).order_by('submitted_at')
 
     # Calculate statistics
     matches_played = matches.count()
@@ -286,6 +349,7 @@ def profile(request, username):
         'set_win_percentage': round(set_win_percentage, 1),
         'game_win_percentage': round(game_win_percentage, 1),
         'elo_history': elo_history,  # Pass ELO history to the template
+        'elo_history_doubles': elo_history_doubles,
         'current_streak': current_streak,  # Add current streak to context
         'longest_streak': longest_streak  # Add longest streak to context
     }

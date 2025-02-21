@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Match, Player
+from .models import Match, Player, MatchDoubles
 from django.forms import DateInput
 import re
 from django.utils import timezone
@@ -76,6 +76,93 @@ class MatchForm(forms.ModelForm):
             raise forms.ValidationError("The winner must win more sets than the loser.")
         elif winner_sets == loser_sets:
             raise forms.ValidationError("The match cannot end in a tie. One player must win more sets than the other.")
+
+        cleaned_data['set_scores'] = set_scores  # Ensure it's stored properly
+        return cleaned_data
+    
+from django import forms
+from django.utils import timezone
+from .models import MatchDoubles, Player
+
+class MatchDoublesForm(forms.ModelForm):
+    winner1_games_set1 = forms.IntegerField(label='Set 1 Games (Winners)', min_value=0, max_value=7, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    winner1_games_set2 = forms.IntegerField(label='Set 2 Games (Winners)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    winner1_games_set3 = forms.IntegerField(label='Set 3 Games (Winners)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+
+    loser1_games_set1 = forms.IntegerField(label='Set 1 Games (Losers)', min_value=0, max_value=7, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    loser1_games_set2 = forms.IntegerField(label='Set 2 Games (Losers)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    loser1_games_set3 = forms.IntegerField(label='Set 3 Games (Losers)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+
+    date = forms.DateField(
+        label='Match Date',
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}, format='%m-%d-%Y')
+    )
+
+    notes = forms.CharField(label='Notes', widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Order players alphabetically by first name and last name
+        ordered_players = Player.objects.order_by('first_name', 'last_name')
+        self.fields['winner1'].queryset = ordered_players
+        self.fields['winner2'].queryset = ordered_players
+        self.fields['loser1'].queryset = ordered_players
+        self.fields['loser2'].queryset = ordered_players
+
+    class Meta:
+        model = MatchDoubles
+        fields = ['winner1', 'winner2', 'loser1', 'loser2', 'winner1_games_set1', 'winner1_games_set2', 'winner1_games_set3', 'loser1_games_set1', 'loser1_games_set2', 'loser1_games_set3', 'date', 'notes']
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        # Check if the match date is in the future
+        match_date = cleaned_data.get('date')
+        if match_date and match_date > timezone.now().date():
+            raise forms.ValidationError("The match date cannot be in the future.")
+
+        # Ensure all required fields are filled for Doubles
+        winner1 = cleaned_data.get('winner1')
+        winner2 = cleaned_data.get('winner2')
+        loser1 = cleaned_data.get('loser1')
+        loser2 = cleaned_data.get('loser2')
+
+        if not all([winner1, winner2, loser1, loser2]):
+            raise forms.ValidationError("All players must be selected for a Doubles match.")
+
+        # Check for duplicate players in the same team
+        if winner1 == winner2:
+            raise forms.ValidationError("The two winners cannot be the same player.")
+        if loser1 == loser2:
+            raise forms.ValidationError("The two losers cannot be the same player.")
+
+        # Check for duplicate players across teams
+        if winner1 in [loser1, loser2] or winner2 in [loser1, loser2]:
+            raise forms.ValidationError("A player cannot be on both the winning and losing teams.")
+
+        # Validate set scores
+        set_scores = []
+        for i in range(1, 4):  # Loop through possible sets
+            winner_score = cleaned_data.get(f'winner1_games_set{i}')
+            loser_score = cleaned_data.get(f'loser1_games_set{i}')
+            if winner_score is not None and loser_score is not None:
+                set_scores.append((winner_score, loser_score))
+
+        if not set_scores:
+            raise forms.ValidationError("At least one set must be recorded.")
+
+        # Validate each set score
+        for set_score in set_scores:
+            if set_score not in VALID_SET_SCORES:
+                raise forms.ValidationError(f"Invalid set score: {set_score}.")
+
+        winner_sets = sum(1 for w, l in set_scores if w > l)
+        loser_sets = len(set_scores) - winner_sets
+
+        if winner_sets <= loser_sets:
+            raise forms.ValidationError("The winning team must win more sets than the losing team.")
+        elif winner_sets == loser_sets:
+            raise forms.ValidationError("The match cannot end in a tie. One team must win more sets than the other.")
 
         cleaned_data['set_scores'] = set_scores  # Ensure it's stored properly
         return cleaned_data

@@ -163,6 +163,12 @@ a:hover {
     }
 }
 
+/* Custom CSS for vertically aligned dropdowns */
+.vertical-dropdowns .form-control {
+    width: 100%; /* Ensure dropdowns take full width */
+    margin-bottom: 10px; /* Add spacing between dropdowns */
+}
+
 /* Customize the hamburger icon color */
 .navbar-toggler-icon {
     background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='%23c8c097' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
@@ -285,6 +291,18 @@ label a.terms-link:hover {
     text-align: center;
     width: 100%;
     display: block;
+}
+
+/* Custom CSS for dropdowns and set scores */
+.dropdown-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Add spacing between dropdowns */
+}
+
+.set-scores-container {
+    display: flex;
+    gap: 10px; /* Add spacing between set scores */
 }
 
 /* Instagram logo styling */
