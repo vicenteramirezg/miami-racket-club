@@ -1,0 +1,35 @@
+{% extends 'rankings/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8"> <!-- Narrower width for the content -->
+            <div class="home-container text-center">
+                <h1 class="my-4 home-title">
+                    <span>Oops!</span> <br>
+                    <span>Page Not Found</span>
+                </h1>
+                <p class="home-text">The page you're looking for doesn't exist or may have been moved.</p>
+                
+                <div class="text-center mt-4">
+                    <p class="home-text">
+                        <a href="{% url 'home' %}" class="home-link">Go to Home</a>
+                    </p>
+                    {% if user.is_authenticated %}
+                        <p class="home-text">
+                            <a href="{% url 'profile' user.username %}" class="home-link">My Profile</a>
+                        </p>
+                        <p class="home-text">
+                            <a href="{% url 'leaderboard' %}" class="home-link">View the Leaderboard</a>
+                        </p>
+                    {% else %}
+                        <p class="home-text">
+                            <a href="{% url 'login' %}" class="home-link">Log In</a> to access your profile and matches.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
