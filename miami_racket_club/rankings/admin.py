@@ -162,7 +162,7 @@ class EloHistoryAdmin(admin.ModelAdmin):
     ordering = ('-submitted_at',)  # Default sorting
 
 class EloHistoryDoublesAdmin(admin.ModelAdmin):
-    list_display = ('player', 'match', 'elo_rating', 'date', 'submitted_at')
+    list_display = ('player', 'match', 'elo_rating_doubles', 'date', 'submitted_at')
     list_filter = ('player', 'match', 'submitted_at')
     search_fields = ('player__username', 'match__id')
     ordering = ('-submitted_at',)
