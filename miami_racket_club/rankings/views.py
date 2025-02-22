@@ -435,9 +435,9 @@ def home(request):
 @approved_required
 def profile(request, username):
     player = get_object_or_404(Player, user__username=username)
-    singles_matches = Match.objects.filter(Q(winner=player) | Q(loser=player)).order_by('-date')
+    singles_matches = Match.objects.filter((Q(winner=player) | Q(loser=player)) & Q(is_deleted=False)).order_by('-date')
     doubles_matches = MatchDoubles.objects.filter(
-        Q(winner1=player) | Q(winner2=player) | Q(loser1=player) | Q(loser2=player)
+        (Q(winner1=player) | Q(winner2=player) | Q(loser1=player) | Q(loser2=player)) & Q(is_deleted=False)
     ).order_by('-date')  # Add this line
     # Fetch ELO history where is_valid=True
     elo_history = ELOHistory.objects.filter(player=player, is_valid=True).order_by('submitted_at')
