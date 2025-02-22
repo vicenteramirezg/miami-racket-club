@@ -24,6 +24,8 @@
         </div>
     </div>
 
+    <h2 class="my-4 text-center" style="color: #c8c097;">Singles</h1>  <!-- Light beige title -->
+
     <!-- Big Stats Cards (Single Horizontal Line) -->
     <div class="row justify-content-center">
         <!-- Match Win Percentage -->
@@ -31,8 +33,8 @@
             <div class="card mb-4 text-center stats-card">
                 <div class="card-body">
                     <h5 class="card-title">Match Win Percentage</h5>
-                    <h3 class="display-4 text-success">{{ match_win_percentage }}%</h3>
-                    <p class="card-text">Total Matches Played: {{ matches_played }}</p>
+                    <h3 class="display-4 text-success">{{ singles_match_win_percentage }}%</h3>
+                    <p class="card-text">Total Matches Played: {{ singles_matches_played }}</p>
                 </div>
             </div>
         </div>
@@ -42,8 +44,8 @@
             <div class="card mb-4 text-center stats-card">
                 <div class="card-body">
                     <h5 class="card-title">Set Win Percentage</h5>
-                    <h3 class="display-4 text-success">{{ set_win_percentage }}%</h3>
-                    <p class="card-text">Total Sets Played: {{ sets_played }}</p>
+                    <h3 class="display-4 text-success">{{ singles_set_win_percentage }}%</h3>
+                    <p class="card-text">Total Sets Played: {{ singles_sets_played }}</p>
                 </div>
             </div>
         </div>
@@ -53,8 +55,8 @@
             <div class="card mb-4 text-center stats-card">
                 <div class="card-body">
                     <h5 class="card-title">Game Win Percentage</h5>
-                    <h3 class="display-4 text-success">{{ game_win_percentage }}%</h3>
-                    <p class="card-text">Total Games Played: {{ games_played }}</p>
+                    <h3 class="display-4 text-success">{{ singles_game_win_percentage }}%</h3>
+                    <p class="card-text">Total Games Played: {{ singles_games_played }}</p>
                 </div>
             </div>
         </div>
@@ -64,33 +66,33 @@
             <div class="card mb-4 text-center stats-card">
                 <div class="card-body">
                     <h5 class="card-title">Current Streak</h5>
-                    <h3 class="display-4 text-success">{{ current_streak }}</h3>
-                    <p class="card-text">Longest Streak: {{ longest_streak }}</p>
+                    <h3 class="display-4 text-success">{{ singles_current_streak }}</h3>
+                    <p class="card-text">Longest Streak: {{ singles_longest_streak }}</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ELO History Chart -->
+    <!-- ELO History Chart (Singles) -->
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card mt-4">
                 <div class="card-body">
-                    <h5 class="card-title">MRC Rating History</h5>
+                    <h5 class="card-title">MRC Rating History (Singles)</h5>
                     <div style="height: 200px;">  <!-- Fixed height container -->
-                        <canvas id="eloChart"></canvas>
+                        <canvas id="eloChartSingles"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Match History -->
+    <!-- Singles Match History -->
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card mt-4">
                 <div class="card-body">
-                    <h5 class="card-title">Match History</h5>
+                    <h5 class="card-title">Singles Match History</h5>
                     <table class="table">
                         <thead>
                             <tr>
@@ -102,7 +104,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for match in matches %}
+                            {% for match in singles_matches %}
                             <tr>
                                 <td>{{ match.date|date:"Y-m-d" }}</td>
                                 <td>
@@ -129,7 +131,104 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="5">No matches found.</td>
+                                <td colspan="5">No singles matches found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="my-4 text-center" style="color: #c8c097;">Doubles</h1>  <!-- Light beige title -->
+
+    <!-- ELO History Chart (Doubles) -->
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">MRC-D Rating History (Doubles)</h5>
+                    <div style="height: 200px;">  <!-- Fixed height container -->
+                        <canvas id="eloChartDoubles"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doubles Match History -->
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Doubles Match History</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Teammate</th>
+                                <th>Opponents</th>
+                                <th>Result</th>
+                                <th>Score</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for match in doubles_matches %}
+                            <tr>
+                                <td>{{ match.date|date:"Y-m-d" }}</td>
+                                <td>
+                                    <!-- Teammate -->
+                                    {% if match.winner1 == player %}
+                                        <a href="{% url 'profile' match.winner2.user.username %}">
+                                            {{ match.winner2.user.first_name }} {{ match.winner2.user.last_name }}
+                                        </a>
+                                    {% elif match.winner2 == player %}
+                                        <a href="{% url 'profile' match.winner1.user.username %}">
+                                            {{ match.winner1.user.first_name }} {{ match.winner1.user.last_name }}
+                                        </a>
+                                    {% elif match.loser1 == player %}
+                                        <a href="{% url 'profile' match.loser2.user.username %}">
+                                            {{ match.loser2.user.first_name }} {{ match.loser2.user.last_name }}
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'profile' match.loser1.user.username %}">
+                                            {{ match.loser1.user.first_name }} {{ match.loser1.user.last_name }}
+                                        </a>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <!-- Opponents -->
+                                    {% if match.winner1 == player or match.winner2 == player %}
+                                        <a href="{% url 'profile' match.loser1.user.username %}">
+                                            {{ match.loser1.user.first_name }} {{ match.loser1.user.last_name }}
+                                        </a> & 
+                                        <a href="{% url 'profile' match.loser2.user.username %}">
+                                            {{ match.loser2.user.first_name }} {{ match.loser2.user.last_name }}
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'profile' match.winner1.user.username %}">
+                                            {{ match.winner1.user.first_name }} {{ match.winner1.user.last_name }}
+                                        </a> & 
+                                        <a href="{% url 'profile' match.winner2.user.username %}">
+                                            {{ match.winner2.user.first_name }} {{ match.winner2.user.last_name }}
+                                        </a>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if match.winner1 == player or match.winner2 == player %}
+                                        <span class="text-success">Win</span>
+                                    {% else %}
+                                        <span class="text-danger">Loss</span>
+                                    {% endif %}
+                                </td>
+                                <td style="white-space: pre;">{{ match.clean_score }}</td>
+                                <td>{{ match.notes|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6">No doubles matches found.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -144,40 +243,35 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const ctx = document.getElementById("eloChart").getContext("2d");
+        // Singles ELO Chart
+        const ctxSingles = document.getElementById("eloChartSingles").getContext("2d");
 
-        // Extract ELO history data from Django context
-        const eloHistory = [
+        const eloHistorySingles = [
             {% for entry in elo_history %}
                 { submitted_at: "{{ entry.submitted_at|date:'Y-m-d'|escapejs }}", elo: {{ entry.elo_rating|escapejs }} },
             {% endfor %}
         ];
 
-        // Create an object to store the latest ELO rating per date
-        const latestEloPerDay = {};
-
-        eloHistory.forEach(entry => {
-            // If the date does not exist in the object or the current entry has a later ELO rating, update it
-            if (!latestEloPerDay[entry.submitted_at] || latestEloPerDay[entry.submitted_at].elo < entry.elo) {
-                latestEloPerDay[entry.submitted_at] = entry;
+        const latestEloPerDaySingles = {};
+        eloHistorySingles.forEach(entry => {
+            if (!latestEloPerDaySingles[entry.submitted_at] || latestEloPerDaySingles[entry.submitted_at].elo < entry.elo) {
+                latestEloPerDaySingles[entry.submitted_at] = entry;
             }
         });
 
-        // Convert the object back to an array and sort by date
-        const filteredEloHistory = Object.values(latestEloPerDay)
-            .sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at)); // Sort by date
+        const filteredEloHistorySingles = Object.values(latestEloPerDaySingles)
+            .sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at));
 
-        // Prepare data for Chart.js
-        const labels = filteredEloHistory.map(entry => entry.submitted_at);
-        const data = filteredEloHistory.map(entry => entry.elo);
+        const labelsSingles = filteredEloHistorySingles.map(entry => entry.submitted_at);
+        const dataSingles = filteredEloHistorySingles.map(entry => entry.elo);
 
-        new Chart(ctx, {
+        new Chart(ctxSingles, {
             type: "line",
             data: {
-                labels: labels,
+                labels: labelsSingles,
                 datasets: [{
-                    label: "MRC Rating",
-                    data: data,
+                    label: "MRC Rating (Singles)",
+                    data: dataSingles,
                     borderColor: "#104730",  // Dark Green Line Color
                     backgroundColor: "#c8c097",  // Light Beige Fill Color
                     borderWidth: 2,
@@ -192,6 +286,53 @@
                 scales: {
                     x: { title: { display: true, text: "Date" } },
                     y: { title: { display: true, text: "MRC Rating" }, beginAtZero: false }
+                }
+            }
+        });
+
+        // Doubles ELO Chart
+        const ctxDoubles = document.getElementById("eloChartDoubles").getContext("2d");
+
+        const eloHistoryDoubles = [
+            {% for entry in elo_history_doubles %}
+                { submitted_at: "{{ entry.submitted_at|date:'Y-m-d'|escapejs }}", elo: {{ entry.elo_rating_doubles|escapejs }} },
+            {% endfor %}
+        ];
+
+        const latestEloPerDayDoubles = {};
+        eloHistoryDoubles.forEach(entry => {
+            if (!latestEloPerDayDoubles[entry.submitted_at] || latestEloPerDayDoubles[entry.submitted_at].elo < entry.elo) {
+                latestEloPerDayDoubles[entry.submitted_at] = entry;
+            }
+        });
+
+        const filteredEloHistoryDoubles = Object.values(latestEloPerDayDoubles)
+            .sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at));
+
+        const labelsDoubles = filteredEloHistoryDoubles.map(entry => entry.submitted_at);
+        const dataDoubles = filteredEloHistoryDoubles.map(entry => entry.elo);
+
+        new Chart(ctxDoubles, {
+            type: "line",
+            data: {
+                labels: labelsDoubles,
+                datasets: [{
+                    label: "MRC-D Rating (Doubles)",
+                    data: dataDoubles,
+                    borderColor: "#4c7563",  // Dark Green Line Color
+                    backgroundColor: "#c8c097",  // Light Beige Fill Color
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    fill: true,  // Fill the area below the line
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: "Date" } },
+                    y: { title: { display: true, text: "MRC-D Rating" }, beginAtZero: false }
                 }
             }
         });
