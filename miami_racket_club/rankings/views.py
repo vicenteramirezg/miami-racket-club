@@ -80,8 +80,16 @@ def submit_match(request):
 @login_required
 @approved_required
 def leaderboard(request):
-    players = Player.objects.order_by('-elo_rating')
-    return render(request, 'rankings/leaderboard.html', {'players': players})
+    # Get players ordered by singles ELO rating
+    singles_players = Player.objects.order_by('-elo_rating')  # Highest ELO first
+    # Get players ordered by doubles ELO rating
+    doubles_players = Player.objects.order_by('-elo_rating_doubles')  # Highest ELO first
+
+    context = {
+        'singles_players': singles_players,
+        'doubles_players': doubles_players,
+    }
+    return render(request, 'rankings/leaderboard.html', context)
 
 def terms_and_conditions(request):
     return render(request, 'registration/terms_and_conditions.html')
@@ -412,10 +420,14 @@ def send_doubles_match_notification(match):
 
 @approved_required
 def home(request):
-    # Fetch recent matches that are not soft-deleted
-    recent_matches = Match.objects.filter(is_deleted=False).order_by('-date')[:10]  # Adjust the number as needed
+    # Get recent singles matches (e.g., last 10 matches)
+    recent_singles_matches = Match.objects.order_by('-date')[:5]
+    # Get recent doubles matches (e.g., last 10 matches)
+    recent_doubles_matches = MatchDoubles.objects.order_by('-date')[:5]
+
     context = {
-        'recent_matches': recent_matches,
+        'recent_singles_matches': recent_singles_matches,
+        'recent_doubles_matches': recent_doubles_matches,
     }
     return render(request, 'rankings/home.html', context)
 

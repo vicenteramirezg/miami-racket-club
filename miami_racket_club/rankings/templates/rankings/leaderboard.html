@@ -5,25 +5,54 @@
     <div class="container">
         <h1 class="my-4 text-center" style="color: #c8c097;">Leaderboard</h1>  <!-- Light beige title -->
 
-        <!-- Table Container with Rounded Edges and Narrower Width -->
-        <div class="border p-4 rounded" style="max-width: 800px; margin: 0 auto; background-color: #4c7563; border-color: #c8c097;"> <!-- Light green background, beige border -->
+        <!-- Singles Leaderboard -->
+        <div class="border p-4 rounded mb-4" style="max-width: 800px; margin: 0 auto; background-color: #4c7563; border-color: #c8c097;">
+            <h2 class="text-center mb-3" style="color: #c8c097;">Singles Leaderboard</h2>  <!-- Light beige title -->
             <table class="table table-striped table-bordered">
                 <thead>
-                    <tr style="background-color: #c8c097; color: #104730;"> <!-- Light beige header with dark green text -->
+                    <tr style="background-color: #c8c097; color: #104730;">  <!-- Light beige header with dark green text -->
                         <th>Rank</th>
                         <th>Player</th>
                         <th>MRC Rating</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for player in players %}
+                    {% for player in singles_players %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td>
-                            <!-- Remove inline styles and classes -->
                             <a href="{% url 'profile' player.user.username %}">{{ player.user.first_name }} {{ player.user.last_name }}</a>
                         </td>
                         <td>{{ player.elo_rating }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="color: #104730;">No players found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Doubles Leaderboard -->
+        <div class="border p-4 rounded" style="max-width: 800px; margin: 0 auto; background-color: #4c7563; border-color: #c8c097;">
+            <h2 class="text-center mb-3" style="color: #c8c097;">Doubles Leaderboard</h2>  <!-- Light beige title -->
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr style="background-color: #c8c097; color: #104730;">  <!-- Light beige header with dark green text -->
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>MRC-D Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in doubles_players %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <a href="{% url 'profile' player.user.username %}">{{ player.user.first_name }} {{ player.user.last_name }}</a>
+                        </td>
+                        <td>{{ player.elo_rating_doubles }}</td>
                     </tr>
                     {% empty %}
                     <tr>

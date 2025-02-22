@@ -23,12 +23,12 @@
                         </p>
                     </div>
 
-                    <!-- Recent Matches Section (only visible if logged in) -->
+                    <!-- Recent Singles Matches Section (only visible if logged in) -->
                     <div class="row justify-content-center">
                         <div class="col-lg-8">
                             <div class="card mt-4">
                                 <div class="card-body">
-                                    <h2 class="card-title text-center">Recent Matches</h2>
+                                    <h2 class="card-title text-center">Recent Singles Matches</h2>
                                     <table class="table">
                                         <thead>
                                             <tr>
@@ -39,7 +39,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for match in recent_matches %}
+                                            {% for match in recent_singles_matches %}
                                             <tr>
                                                 <td>{{ match.date|date:"Y-m-d" }}</td>
                                                 <td>
@@ -52,7 +52,48 @@
                                             </tr>
                                             {% empty %}
                                             <tr>
-                                                <td colspan="4">No recent matches found.</td>
+                                                <td colspan="4">No recent singles matches found.</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Doubles Matches Section (only visible if logged in) -->
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2 class="card-title text-center">Recent Doubles Matches</h2>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Winners</th>
+                                                <th>Losers</th>
+                                                <th>Score</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for match in recent_doubles_matches %}
+                                            <tr>
+                                                <td>{{ match.date|date:"Y-m-d" }}</td>
+                                                <td>
+                                                    <a href="{% url 'profile' match.winner1.user.username %}">{{ match.winner1.user.first_name }} {{ match.winner1.user.last_name }}</a> & 
+                                                    <a href="{% url 'profile' match.winner2.user.username %}">{{ match.winner2.user.first_name }} {{ match.winner2.user.last_name }}</a>
+                                                </td>
+                                                <td>
+                                                    <a href="{% url 'profile' match.loser1.user.username %}">{{ match.loser1.user.first_name }} {{ match.loser1.user.last_name }}</a> & 
+                                                    <a href="{% url 'profile' match.loser2.user.username %}">{{ match.loser2.user.first_name }} {{ match.loser2.user.last_name }}</a>
+                                                </td>
+                                                <td style="white-space: pre;">{{ match.clean_score }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="4">No recent doubles matches found.</td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>
