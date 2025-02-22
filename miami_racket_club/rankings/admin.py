@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from email.utils import formataddr
 from email.header import Header
-from .models import Player, Match, ELOHistory
+from .models import Player, Match, ELOHistory, MatchDoubles, ELOHistoryDoubles
 
 class PlayerAdmin(admin.ModelAdmin):
     list_display = ('user', 'is_approved', 'user__first_name', 'user__last_name')
@@ -161,10 +161,16 @@ class EloHistoryAdmin(admin.ModelAdmin):
     search_fields = ('player__username', 'match__id')  # Add search functionality
     ordering = ('-submitted_at',)  # Default sorting
 
+class EloHistoryDoublesAdmin(admin.ModelAdmin):
+    list_display = ('player', 'match', 'elo_rating', 'date', 'submitted_at')
+    list_filter = ('player', 'match', 'submitted_at')
+    search_fields = ('player__username', 'match__id')
+    ordering = ('-submitted_at',)
+
 @admin.action(description='Revert selected matches and restore ELO ratings')
 def revert_matches(modeladmin, request, queryset):
     """
-    Custom admin action to revert selected matches and restore ELO ratings.
+    Revert selected matches (Singles and Doubles) and restore ELO ratings.
     """
     for match in queryset:
         if not match.is_deleted:
@@ -176,12 +182,13 @@ def revert_matches(modeladmin, request, queryset):
 class MatchAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'winner', 'loser', 'winner_elo_before', 'loser_elo_before',
-        'winner_elo_after', 'loser_elo_after', 'set_scores', 'date', 'submitted_by', 'submitted_at', 'is_deleted'
-    )  # Display all fields
-    list_filter = ('is_deleted', 'date', 'submitted_at')  # Add filters
-    search_fields = ('winner__username', 'loser__username')  # Add search functionality
-    actions = [revert_matches]  # Add the custom action
-    ordering = ('-submitted_at',)  # Default sorting
+        'winner_elo_after', 'loser_elo_after', 'set_scores', 'date', 
+        'submitted_by', 'submitted_at', 'is_deleted'
+    )  
+    list_filter = ('is_deleted', 'date', 'submitted_at')  
+    search_fields = ('winner__username', 'loser__username')  
+    actions = [revert_matches]  
+    ordering = ('-submitted_at',)  
     fieldsets = (
         (None, {
             'fields': ('winner', 'loser', 'set_scores', 'date', 'notes', 'is_deleted')
@@ -193,8 +200,40 @@ class MatchAdmin(admin.ModelAdmin):
             'fields': ('submitted_by', 'submitted_at')
         }),
     )
-    readonly_fields = ('submitted_at',)  # Make these fields read-only
+    readonly_fields = ('submitted_at',)  
 
-admin.site.register(Player, PlayerAdmin)
-admin.site.register(ELOHistory, EloHistoryAdmin)
+class MatchDoublesAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'winner1', 'winner2', 'loser1', 'loser2', 
+        'winner1_elo_before', 'winner2_elo_before', 
+        'loser1_elo_before', 'loser2_elo_before',
+        'winner1_elo_after', 'winner2_elo_after',
+        'loser1_elo_after', 'loser2_elo_after',
+        'set_scores', 'date', 'submitted_by', 'submitted_at', 'is_deleted'
+    )
+    list_filter = ('is_deleted', 'date', 'submitted_at')
+    search_fields = ('winner1__username', 'winner2__username', 'loser1__username', 'loser2__username')
+    actions = [revert_matches]
+    ordering = ('-submitted_at',)
+    fieldsets = (
+        (None, {
+            'fields': ('winner1', 'winner2', 'loser1', 'loser2', 'set_scores', 'date', 'notes', 'is_deleted')
+        }),
+        ('ELO Ratings', {
+            'fields': ('winner1_elo_before', 'winner2_elo_before', 
+                       'loser1_elo_before', 'loser2_elo_before',
+                       'winner1_elo_after', 'winner2_elo_after', 
+                       'loser1_elo_after', 'loser2_elo_after')
+        }),
+        ('Submission Details', {
+            'fields': ('submitted_by', 'submitted_at')
+        }),
+    )
+    readonly_fields = ('submitted_at',)
+
+# Register models in Django Admin
+admin.site.register(Player)
+admin.site.register(ELOHistory)
+admin.site.register(ELOHistoryDoubles)
 admin.site.register(Match, MatchAdmin)
+admin.site.register(MatchDoubles, MatchDoublesAdmin)

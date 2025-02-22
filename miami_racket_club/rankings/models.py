@@ -374,8 +374,11 @@ class MatchDoubles(models.Model):
         and soft-deleting the match.
         """
         with transaction.atomic():
-            print(f"Before Reversion - Winner ELO: {self.winner1.elo_rating_doubles}, Loser ELO: {self.loser1.elo_rating_doubles}")  # Debug
-            print(f"Reverting to - Winner ELO Before: {self.winner1_elo_before}, Loser ELO Before: {self.loser1_elo_before}")  # Debug
+            print(f"Before Reversion - Winner1 ELO: {self.winner1.elo_rating_doubles}, Winner2 ELO: {self.winner2.elo_rating_doubles}, "
+                f"Loser1 ELO: {self.loser1.elo_rating_doubles}, Loser2 ELO: {self.loser2.elo_rating_doubles}")  # Debugging
+
+            print(f"Reverting to - Winner1 ELO Before: {self.winner1_elo_before}, Winner2 ELO Before: {self.winner2_elo_before}, "
+                f"Loser1 ELO Before: {self.loser1_elo_before}, Loser2 ELO Before: {self.loser2_elo_before}")  # Debugging
 
             # Revert ELO ratings
             self.winner1.elo_rating_doubles = self.winner1_elo_before
@@ -389,7 +392,8 @@ class MatchDoubles(models.Model):
             self.loser1.save()
             self.loser2.save()
 
-            print(f"After Reversion - Winner ELO: {self.winner1.elo_rating_doubles} - {self.winner2.elo_rating_doubles}, Loser ELO: {self.loser1.elo_rating_doubles} - {self.loser1.elo_rating_doubles}")  # Debug
+            print(f"After Reversion - Winner1 ELO: {self.winner1.elo_rating_doubles}, Winner2 ELO: {self.winner2.elo_rating_doubles}, "
+                f"Loser1 ELO: {self.loser1.elo_rating_doubles}, Loser2 ELO: {self.loser2.elo_rating_doubles}")  # Debugging
 
             # Soft delete the match
             self.is_deleted = True
@@ -397,8 +401,8 @@ class MatchDoubles(models.Model):
             # Save the match without validation or ELO calculation
             self.save(skip_validation=True, skip_elo_calculation=True)
 
-            # Mark the corresponding EloHistory entries as invalid
-            ELOHistory.objects.filter(match=self).update(is_valid=False)
+            # Mark the corresponding EloHistoryDoubles entries as invalid
+            ELOHistoryDoubles.objects.filter(match=self).update(is_valid=False)
 
 class ELOHistoryDoubles(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history_doubles')
