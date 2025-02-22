@@ -232,8 +232,8 @@ class MatchDoublesAdmin(admin.ModelAdmin):
     readonly_fields = ('submitted_at',)
 
 # Register models in Django Admin
-admin.site.register(Player)
-admin.site.register(ELOHistory)
-admin.site.register(ELOHistoryDoubles)
+admin.site.register(Player, PlayerAdmin)
+admin.site.register(ELOHistory, EloHistoryAdmin)
+admin.site.register(ELOHistoryDoubles, EloHistoryDoublesAdmin)
 admin.site.register(Match, MatchAdmin)
 admin.site.register(MatchDoubles, MatchDoublesAdmin)
