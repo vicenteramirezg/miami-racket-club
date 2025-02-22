@@ -85,13 +85,13 @@ from django.utils import timezone
 from .models import MatchDoubles, Player
 
 class MatchDoublesForm(forms.ModelForm):
-    winner1_games_set1 = forms.IntegerField(label='Set 1 Games (Winners)', min_value=0, max_value=7, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    winner1_games_set2 = forms.IntegerField(label='Set 2 Games (Winners)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    winner1_games_set3 = forms.IntegerField(label='Set 3 Games (Winners)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    winner_games_set1 = forms.IntegerField(label='Set 1 Games (Winners)', min_value=0, max_value=7, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    winner_games_set2 = forms.IntegerField(label='Set 2 Games (Winners)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    winner_games_set3 = forms.IntegerField(label='Set 3 Games (Winners)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
-    loser1_games_set1 = forms.IntegerField(label='Set 1 Games (Losers)', min_value=0, max_value=7, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    loser1_games_set2 = forms.IntegerField(label='Set 2 Games (Losers)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    loser1_games_set3 = forms.IntegerField(label='Set 3 Games (Losers)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    loser_games_set1 = forms.IntegerField(label='Set 1 Games (Losers)', min_value=0, max_value=7, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    loser_games_set2 = forms.IntegerField(label='Set 2 Games (Losers)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    loser_games_set3 = forms.IntegerField(label='Set 3 Games (Losers)', min_value=0, max_value=7, required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
     date = forms.DateField(
         label='Match Date',
@@ -111,7 +111,7 @@ class MatchDoublesForm(forms.ModelForm):
 
     class Meta:
         model = MatchDoubles
-        fields = ['winner1', 'winner2', 'loser1', 'loser2', 'winner1_games_set1', 'winner1_games_set2', 'winner1_games_set3', 'loser1_games_set1', 'loser1_games_set2', 'loser1_games_set3', 'date', 'notes']
+        fields = ['winner1', 'winner2', 'loser1', 'loser2', 'date', 'notes']  # Exclude `set_scores`
 
     def clean(self):
         cleaned_data = super().clean()
@@ -143,8 +143,8 @@ class MatchDoublesForm(forms.ModelForm):
         # Validate set scores
         set_scores = []
         for i in range(1, 4):  # Loop through possible sets
-            winner_score = cleaned_data.get(f'winner1_games_set{i}')
-            loser_score = cleaned_data.get(f'loser1_games_set{i}')
+            winner_score = cleaned_data.get(f'winner_games_set{i}')
+            loser_score = cleaned_data.get(f'loser_games_set{i}')
             if winner_score is not None and loser_score is not None:
                 set_scores.append((winner_score, loser_score))
 

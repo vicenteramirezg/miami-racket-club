@@ -28,6 +28,7 @@ def submit_doubles_match(request):
         if form.is_valid():
             match = form.save(commit=False)
             match.submitted_by = request.user
+            match.set_scores = form.cleaned_data['set_scores']  # Ensure set_scores is set
             match.save()
 
             # Create ELOHistoryDoubles records for the two winners and two losers
@@ -37,12 +38,11 @@ def submit_doubles_match(request):
             loser2 = form.cleaned_data['loser2']
 
             # Save ELOHistoryDoubles for the winners and losers
-            # Note: You may want to calculate the ELO ratings based on your logic
             for player in [winner1, winner2]:
                 ELOHistoryDoubles.objects.create(
                     player=player,
                     match=match,
-                    elo_rating=player.elo_rating,  # Adjust based on how you calculate the rating
+                    elo_rating_doubles=player.elo_rating_doubles,  # Adjust based on how you calculate the rating
                     date=match.date,
                 )
 
@@ -50,11 +50,11 @@ def submit_doubles_match(request):
                 ELOHistoryDoubles.objects.create(
                     player=player,
                     match=match,
-                    elo_rating=player.elo_rating,  # Adjust based on how you calculate the rating
+                    elo_rating_doubles=player.elo_rating_doubles,  # Adjust based on how you calculate the rating
                     date=match.date,
                 )
 
-            send_match_notification(match)
+            send_doubles_match_notification(match)  # Use the new function
             return redirect('leaderboard')
     else:
         form = MatchDoublesForm()
@@ -68,34 +68,13 @@ def submit_match(request):
         form = MatchForm(request.POST)
         if form.is_valid():
             match = form.save(commit=False)
-            match.submitted_by = request.user
+            match.set_scores = form.cleaned_data['set_scores']
+            match.submitted_by = request.user  # Set the user who submitted the match
             match.save()
-
-            # Create ELOHistory records for the winner and loser
-            winner = form.cleaned_data['winner']
-            loser = form.cleaned_data['loser']
-
-            # Save ELOHistory for the winner and loser
-            # Note: You may want to calculate the ELO ratings based on your logic
-            ELOHistory.objects.create(
-                player=winner,
-                match=match,
-                elo_rating=winner.elo_rating,  # Adjust based on how you calculate the rating
-                date=match.date,
-            )
-
-            ELOHistory.objects.create(
-                player=loser,
-                match=match,
-                elo_rating=loser.elo_rating,  # Adjust based on how you calculate the rating
-                date=match.date,
-            )
-
-            send_match_notification(match)
+            send_match_notification(match)  # Send notification
             return redirect('leaderboard')
     else:
         form = MatchForm()
-
     return render(request, 'rankings/submit_match.html', {'form': form})
 
 @login_required
@@ -244,6 +223,174 @@ def send_match_notification(match):
                     <h3>New Match Submitted</h3>
                     <p><strong>🏆 Result:</strong> {result}</p>
                     <p><strong>🆚 Opponent:</strong> {opponent}</p>
+                    <p><strong>📊 Score:</strong> {formatted_score}</p>
+                    <p><strong>📅 Date:</strong> {match.date}</p>
+                    <p><strong>📝 Notes:</strong> {match.notes}</p>
+                    <p style="text-align: center;">
+                        <a href="{profile_url}" class="profile-button">View Profile</a>
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfSGy5zy6x8zSiVnA5s2a7ImnUOgiP3hN4rbmecO_RYJWRu6Q/viewform?usp=sharing" class="profile-button">Fill Out Survey</a>
+                    </p>
+                </div>
+                <div class="footer">
+                    <p>See you on court!</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        '''
+        
+        recipient_list = [player.user.email]
+        send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
+
+def send_doubles_match_notification(match):
+    from_email = formataddr(("Miami Racket Club", settings.DEFAULT_FROM_EMAIL))
+    subject = Header("New Doubles Match Submitted", "utf-8").encode()
+    
+    # Hosted/static image URL (update if necessary)
+    logo_url = "https://miami-racket-club-496610aca6a3.herokuapp.com/static/rankings/logo-color.png"
+
+    # Font URL (import Google Font)
+    font_url = "https://fonts.googleapis.com/css2?family=Alegreya:wght@400;700&display=swap"
+
+    # Get all players involved in the match
+    players = [match.winner1, match.winner2, match.loser1, match.loser2]
+
+    for player in players:
+        # Determine the player's team and result
+        if player in [match.winner1, match.winner2]:
+            result = "✅ Win"
+            teammate = match.winner2 if player == match.winner1 else match.winner1
+            opponents = f"{match.loser1.user.first_name} {match.loser1.user.last_name} & {match.loser2.user.first_name} {match.loser2.user.last_name}"
+        else:
+            result = "❌ Lose"
+            teammate = match.loser2 if player == match.loser1 else match.loser1
+            opponents = f"{match.winner1.user.first_name} {match.winner1.user.last_name} & {match.winner2.user.first_name} {match.winner2.user.last_name}"
+
+        # Create the profile URL
+        profile_url = f"{settings.SITE_URL}/profile/{player.user.username}"
+
+        # Replace double spaces with &nbsp;
+        formatted_score = match.clean_score().replace("  ", "&nbsp;&nbsp;")
+
+        # Plain text version (fallback)
+        plain_message = f'''
+        🎉 A new doubles match has been submitted!
+
+        - 🏆 Result: {result}
+        - 🤝 Teammate: {teammate.user.first_name} {teammate.user.last_name}
+        - 🆚 Opponents: {opponents}
+        - 📊 Score: {formatted_score}
+        - 📅 Date: {match.date}
+        - 📝 Notes: {match.notes}
+
+        Visit your profile: {profile_url}
+
+        See you on court!
+        '''
+
+        # HTML version with logo and styles
+        html_message = f'''
+        <html>
+        <head>
+            <style>
+                /* Import Alegreya font */
+                @import url('{font_url}');
+
+                /* Apply custom styles */
+                body {{
+                    font-family: 'Alegreya', serif;
+                    color: #104730; /* Dark green text */
+                    background-color: #ffffff; /* White background */
+                    margin: 0;
+                    padding: 20px;
+                }}
+
+                .email-container {{
+                    max-width: 500px;
+                    margin: auto;
+                    padding: 20px;
+                    border: 1px solid #ddd;
+                    border-radius: 10px;
+                    background-color: #f9f9f9;
+                }}
+
+                .email-header {{
+                    text-align: center;
+                }}
+
+                .email-header img {{
+                    max-width: 150px;
+                    margin-bottom: 10px;
+                }}
+
+                .email-content {{
+                    text-align: center;
+                }}
+
+                h3 {{
+                    color: #104730; /* Dark green for the header */
+                }}
+
+                p {{
+                    font-size: 16px;
+                    margin: 10px 0;
+                }}
+
+                .footer {{
+                    margin-top: 20px;
+                    text-align: center;
+                    font-size: 14px;
+                }}
+
+                a {{
+                    color: #c8c097; /* Light beige text color */
+                    text-decoration: none; /* Remove underline */
+                }}
+                a:hover {{
+                    text-decoration: none; /* Ensure no underline on hover */
+                }}
+
+                .profile-button {{
+                    display: inline-block;
+                    background-color: #c8c097; /* Light beige background */
+                    color: #c8c097; /* Light beige text color */
+                    padding: 12px 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    text-align: center;
+                    transition: background-color 0.3s ease;
+                }}
+
+                .profile-button:hover {{
+                    background-color: #9c9572; /* Darker green on hover */
+                }}
+
+                /* Hidden preview text */
+                .preview-text {{
+                    display: none;
+                    font-size: 0;
+                    color: transparent;
+                    line-height: 0;
+                    max-height: 0;
+                    mso-hide: all; /* Hide in Outlook */
+                }}
+            </style>
+        </head>
+        <body>
+            <!-- Hidden preview text -->
+            <span class="preview-text">A new doubles match has been submitted. Check the details.</span>
+
+            <div class="email-container">
+                <div class="email-header">
+                    <img src="{logo_url}" alt="Miami Racket Club Logo">
+                </div>
+                <div class="email-content">
+                    <h3>New Doubles Match Submitted</h3>
+                    <p><strong>🏆 Result:</strong> {result}</p>
+                    <p><strong>🤝 Teammate:</strong> {teammate.user.first_name} {teammate.user.last_name}</p>
+                    <p><strong>🆚 Opponents:</strong> {opponents}</p>
                     <p><strong>📊 Score:</strong> {formatted_score}</p>
                     <p><strong>📅 Date:</strong> {match.date}</p>
                     <p><strong>📝 Notes:</strong> {match.notes}</p>

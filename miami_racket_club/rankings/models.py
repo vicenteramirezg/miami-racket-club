@@ -363,10 +363,10 @@ class MatchDoubles(models.Model):
                 match_datetime = timezone.make_aware(timezone.datetime.combine(self.date, timezone.datetime.min.time()))
                 
                 # Creating ELOHistory and linking to the match
-                ELOHistory.objects.create(player=self.winner1, elo_rating_doubles=new_winner1_rating, date=match_datetime, match=self, is_valid=True)
-                ELOHistory.objects.create(player=self.winner2, elo_rating_doubles=new_winner2_rating, date=match_datetime, match=self, is_valid=True)
-                ELOHistory.objects.create(player=self.loser1, elo_rating_doubles=new_loser1_rating, date=match_datetime, match=self, is_valid=True)
-                ELOHistory.objects.create(player=self.loser2, elo_rating_doubles=new_loser2_rating, date=match_datetime, match=self, is_valid=True)
+                ELOHistoryDoubles.objects.create(player=self.winner1, elo_rating_doubles=new_winner1_rating, date=match_datetime, match=self, is_valid=True)
+                ELOHistoryDoubles.objects.create(player=self.winner2, elo_rating_doubles=new_winner2_rating, date=match_datetime, match=self, is_valid=True)
+                ELOHistoryDoubles.objects.create(player=self.loser1, elo_rating_doubles=new_loser1_rating, date=match_datetime, match=self, is_valid=True)
+                ELOHistoryDoubles.objects.create(player=self.loser2, elo_rating_doubles=new_loser2_rating, date=match_datetime, match=self, is_valid=True)
 
     def revert_match(self):
         """
@@ -403,7 +403,7 @@ class MatchDoubles(models.Model):
 class ELOHistoryDoubles(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history_doubles')
     match = models.ForeignKey(MatchDoubles, on_delete=models.CASCADE, related_name='elo_history_doubles')  # Link to MatchDoubles
-    elo_rating_doubles = models.IntegerField()
+    elo_rating_doubles = models.IntegerField()  # Correct field name
     date = models.DateTimeField()  # Match date (not auto-updating)
     submitted_at = models.DateTimeField(default=timezone.now)  # Track when the log was recorded
     is_valid = models.BooleanField(default=True)  # Validity of this entry
