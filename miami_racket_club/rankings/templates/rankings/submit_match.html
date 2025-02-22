@@ -37,9 +37,12 @@
                                 <span class="badge bg-success mb-1">Winner</span>
                                 {{ form.winner }}
                             </div>
-                            <div class="col-3">{{ form.winner_games_set1 }}</div>
-                            <div class="col-3">{{ form.winner_games_set2 }}</div>
-                            <div class="col-3">{{ form.winner_games_set3 }}</div>
+                            <!-- Set Scores for Winners -->
+                            <div class="col-6 set-scores-container d-flex align-items-center gap-3">
+                                <div class="col-3">{{ form.winner_games_set1 }}</div>
+                                <div class="col-3">{{ form.winner_games_set2 }}</div>
+                                <div class="col-3">{{ form.winner_games_set3 }}</div>
+                            </div>
                         </div>
 
                         <hr class="my-2">
@@ -49,9 +52,12 @@
                                 <span class="badge bg-danger mb-1">Loser</span>
                                 {{ form.loser }}
                             </div>
-                            <div class="col-3">{{ form.loser_games_set1 }}</div>
-                            <div class="col-3">{{ form.loser_games_set2 }}</div>
-                            <div class="col-3">{{ form.loser_games_set3 }}</div>
+                            <!-- Set Scores for Winners -->
+                            <div class="col-6 set-scores-container d-flex align-items-center gap-3">
+                                <div class="col-3">{{ form.loser_games_set1 }}</div>
+                                <div class="col-3">{{ form.loser_games_set2 }}</div>
+                                <div class="col-3">{{ form.loser_games_set3 }}</div>
+                            </div>
                         </div>
                     </div>
 
