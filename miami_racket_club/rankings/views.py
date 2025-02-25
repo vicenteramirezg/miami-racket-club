@@ -20,6 +20,22 @@ from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
+USTA_TO_UTR = {
+    3: 4,
+    3.25: 4.5,
+    3.5: 5,
+    3.75: 5.5,
+    4: 6,
+    4.25: 7,
+    4.5: 8,
+    4.75: 9,
+    5: 10,
+    5.25: 10.5,
+    5.5: 11,
+    5.75: 11.5,
+    6: 12
+}
+
 @login_required
 @approved_required
 def submit_doubles_match(request):
@@ -596,7 +612,7 @@ class SignUpView(CreateView):
             defaults={
                 "first_name": form.cleaned_data.get("first_name", ""),
                 "last_name": form.cleaned_data.get("last_name", ""),
-                "usta_rating": form.cleaned_data.get("usta_rating", 3.00),
+                "usta_rating": float(form.cleaned_data.get("usta_rating", 3.00)),
                 "neighborhood": form.cleaned_data.get("neighborhood", "Other"),
                 "phone_number": form.cleaned_data.get("phone_number", ""),
             }
@@ -604,6 +620,11 @@ class SignUpView(CreateView):
 
         # Send the welcome email (only if the player was just created)
         if created:
+            usta_rating = player.usta_rating
+            player.elo_rating = (USTA_TO_UTR.get(usta_rating, 3) * 100)
+            player.elo_rating_doubles = (USTA_TO_UTR.get(usta_rating, 3) * 100)
+            player.save()  # Save the updated ELO rating
+
             self.send_welcome_email(user)  # Pass the user object here
 
         # Don't log the user in if they are pending approval
