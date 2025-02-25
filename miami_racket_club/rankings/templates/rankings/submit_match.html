@@ -22,7 +22,7 @@
         </div>
     {% endif %}
 
-    <form method="post" action="{% url 'submit_match' %}">
+    <form method="post" action="{% url 'submit_match' %}" id="matchForm">
         {% csrf_token %}
         <div class="row justify-content-center">
             <div class="col-lg-8">
@@ -77,11 +77,39 @@
 
                     <!-- Submit Button Inside the Bordered Container -->
                     <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg" style="background-color: #c8c097; border-color: #c8c097; color: #104730;">Submit Match</button>
+                        <button type="submit" class="btn btn-primary btn-lg" style="background-color: #c8c097; border-color: #c8c097; color: #104730;" id="submitButton">
+                            Submit Match
+                            <span id="countdown" style="display: none;"></span>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
 </div>
+
+<!-- JavaScript to temporarily disable the submit button -->
+<script>
+    document.getElementById('matchForm').addEventListener('submit', function(event) {
+        const submitButton = document.getElementById('submitButton');
+        const countdownElement = document.getElementById('countdown');
+        let delayInSeconds = 5; // Disable for 5 seconds
+
+        // Disable the button and show countdown
+        submitButton.disabled = true;
+        countdownElement.style.display = 'inline';
+        countdownElement.textContent = ` (${delayInSeconds}s)`;
+
+        // Update countdown every second
+        const countdown = setInterval(function() {
+            delayInSeconds--;
+            countdownElement.textContent = ` (${delayInSeconds}s)`;
+            if (delayInSeconds <= 0) {
+                clearInterval(countdown);
+                submitButton.disabled = false;
+                countdownElement.style.display = 'none';
+            }
+        }, 1000);
+    });
+</script>
 {% endblock %}

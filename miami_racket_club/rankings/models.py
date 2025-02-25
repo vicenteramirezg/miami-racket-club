@@ -408,7 +408,7 @@ class ELOHistoryDoubles(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history_doubles')
     match = models.ForeignKey(MatchDoubles, on_delete=models.CASCADE, related_name='elo_history_doubles')  # Link to MatchDoubles
     elo_rating_doubles = models.IntegerField()  # Correct field name
-    date = models.DateTimeField()  # Match date (not auto-updating)
+    date = models.DateTimeField(default=timezone.now)  # Match date (not auto-updating)
     submitted_at = models.DateTimeField(default=timezone.now)  # Track when the log was recorded
     is_valid = models.BooleanField(default=True)  # Validity of this entry
 

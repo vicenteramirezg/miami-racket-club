@@ -95,7 +95,8 @@ class MatchDoublesForm(forms.ModelForm):
 
     date = forms.DateField(
         label='Match Date',
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}, format='%m-%d-%Y')
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}, format='%m-%d-%Y'),
+        initial=timezone.now
     )
 
     notes = forms.CharField(label='Notes', widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), required=False)
