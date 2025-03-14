@@ -115,27 +115,20 @@ class Match(models.Model):
 
         with transaction.atomic():
             if not skip_validation:
-                # Check if the match date is in the future
                 if self.date > timezone.now().date():
                     raise ValidationError("The match date cannot be in the future.")
                 
-                # Check if winner and loser are the same player
                 if self.winner == self.loser:
                     raise ValidationError("The winner and loser cannot be the same player.")
                 
-                # Validate each set score
-                for set_score in self.set_scores:
+                for index, set_score in enumerate(self.set_scores):
+                    if index == 2 and set_score == (1, 0):  # Allow (1,0) only for the third set
+                        continue
                     if set_score not in VALID_SET_SCORES:
                         raise ValidationError(f"Invalid set score: {set_score}. Valid scores are: {VALID_SET_SCORES}.")
                 
-                # Validate set scores
-                winner_sets = 0
-                loser_sets = 0
-                for set_score in self.set_scores:
-                    if set_score[0] > set_score[1]:
-                        winner_sets += 1
-                    else:
-                        loser_sets += 1
+                winner_sets = sum(1 for w, l in self.set_scores if w > l)
+                loser_sets = len(self.set_scores) - winner_sets
 
                 if winner_sets <= loser_sets:
                     raise ValidationError("The winner must win more sets than the loser.")

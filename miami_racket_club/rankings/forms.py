@@ -65,7 +65,9 @@ class MatchForm(forms.ModelForm):
             raise forms.ValidationError("At least one set must be recorded.")
         
         # Validate each set score
-        for set_score in set_scores:
+        for index, set_score in enumerate(set_scores):
+            if index == 2 and set_score == (1, 0):  # Third set super tie-break rule
+                continue  # Allow (1,0) for third set
             if set_score not in VALID_SET_SCORES:
                 raise forms.ValidationError(f"Invalid set score: {set_score}.")
 
@@ -79,10 +81,6 @@ class MatchForm(forms.ModelForm):
 
         cleaned_data['set_scores'] = set_scores  # Ensure it's stored properly
         return cleaned_data
-    
-from django import forms
-from django.utils import timezone
-from .models import MatchDoubles, Player
 
 class MatchDoublesForm(forms.ModelForm):
     winner_games_set1 = forms.IntegerField(label='Set 1 Games (Winners)', min_value=0, max_value=7, widget=forms.NumberInput(attrs={'class': 'form-control'}))
