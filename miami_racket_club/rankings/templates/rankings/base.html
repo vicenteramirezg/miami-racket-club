@@ -194,6 +194,7 @@
                         <a class="nav-link" href="{% url 'leaderboard' %}">Leaderboard</a>
                         <a class="nav-link" href="{% url 'player_directory' %}">Player Directory</a>
                         <a class="nav-link" href="{% url 'profile' user.username %}">My Profile</a>
+                        <a class="nav-link" href="{% url 'faq' %}">FAQ</a>
                         <form action="{% url 'logout' %}" method="post" class="d-inline">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-link nav-link p-0">Log out</button>

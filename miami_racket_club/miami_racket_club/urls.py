@@ -11,6 +11,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup/', SignUpView.as_view(), name='signup'),
     path('terms-and-conditions/', views.terms_and_conditions, name='terms_and_conditions'),
+    path('faq/', views.faq, name='faq'),
     path('profile/<str:username>/', views.profile, name='profile'),
     path('pending-approval/', views.pending_approval, name='pending_approval'),
     

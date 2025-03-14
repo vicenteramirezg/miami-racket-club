@@ -163,6 +163,12 @@ a:hover {
     }
 }
 
+/* Custom CSS for vertically aligned dropdowns */
+.vertical-dropdowns .form-control {
+    width: 100%; /* Ensure dropdowns take full width */
+    margin-bottom: 10px; /* Add spacing between dropdowns */
+}
+
 /* Customize the hamburger icon color */
 .navbar-toggler-icon {
     background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='%23c8c097' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
@@ -287,8 +293,53 @@ label a.terms-link:hover {
     display: block;
 }
 
+/* Custom CSS for dropdowns and set scores */
+.dropdown-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Add spacing between dropdowns */
+}
+
+.set-scores-container {
+    display: flex;
+    gap: 10px; /* Add spacing between set scores */
+}
+
 /* Instagram logo styling */
 .footer .instagram-logo {
     width: 40px; /* Adjust size as necessary */
     margin-bottom: 10px; /* Space between icon and text */
+}
+
+/* Custom Accordion Styles */
+.custom-accordion-item {
+    background-color: #4c7563; /* Background color for accordion items */
+    border: 1px solid #c8c097; /* Light beige border */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 10px; /* Space between accordion items */
+}
+
+.custom-accordion-button {
+    background-color: #4c7563; /* Background color for accordion headers */
+    color: #c8c097 !important; /* Light beige text for questions */
+    font-weight: bold; /* Bold text for questions */
+    padding: 15px; /* Padding for better spacing */
+    border: none; /* Remove default border */
+    box-shadow: none; /* Remove default box shadow */
+}
+
+.custom-accordion-button:not(.collapsed) {
+    background-color: #4c7563; /* Keep background color consistent when expanded */
+    color: #c8c097 !important; /* Keep text color consistent when expanded */
+}
+
+.custom-accordion-button::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23c8c097'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e"); /* Custom caret color (light beige) */
+}
+
+.custom-accordion-body {
+    background-color: #ffffff; /* White background for answers */
+    color: #104730; /* Black text for answers */
+    padding: 15px; /* Padding for better spacing */
+    border-top: 1px solid #c8c097; /* Light beige border between question and answer */
 }

@@ -975,3 +975,6 @@ class CustomPasswordResetView(PasswordResetView):
             email_message.attach_alternative(html_email, 'text/html')
 
         email_message.send()
+
+def faq(request):
+    return render(request, 'registration/faq.html')
