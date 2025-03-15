@@ -101,6 +101,7 @@
                                 <th>Result</th>
                                 <th>Score</th>
                                 <th>Notes</th>
+                                <th>Share</th>  <!-- New column for the Share button -->
                             </tr>
                         </thead>
                         <tbody>
@@ -128,10 +129,16 @@
                                 </td>
                                 <td style="white-space: pre;">{{ match.clean_score }}</td>
                                 <td>{{ match.notes|default:"-" }}</td>
+                                <td>
+                                    <!-- Share Button -->
+                                    <a href="#" class="btn btn-sm btn-outline-success" onclick="shareOnWhatsApp(`🎾 New Singles Match Submitted:\n\n{{ match.winner.user.first_name }} {{ match.winner.user.last_name }} took the win on {{ match.date|date:'Y-m-d' }} against {{ match.loser.user.first_name }} {{ match.loser.user.last_name }} by {{ match.clean_score }}.`); event.preventDefault();">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style="width: 20px; height: 20px; margin-right: 5px;"> Share
+                                    </a>
+                                </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="5">No singles matches found.</td>
+                                <td colspan="6">No singles matches found.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -219,6 +226,7 @@
                                 <th>Result</th>
                                 <th>Score</th>
                                 <th>Notes</th>
+                                <th>Share</th>  <!-- New column for the Share button -->
                             </tr>
                         </thead>
                         <tbody>
@@ -272,10 +280,16 @@
                                 </td>
                                 <td style="white-space: pre;">{{ match.clean_score }}</td>
                                 <td>{{ match.notes|default:"-" }}</td>
+                                <td>
+                                    <!-- Share Button -->
+                                    <a href="#" class="btn btn-sm btn-outline-success" onclick="shareOnWhatsApp(`🎾 New Doubles Match Submitted:\n\n{{ match.winner1.user.first_name }} {{ match.winner1.user.last_name }} and {{ match.winner2.user.first_name }} {{ match.winner2.user.last_name }} took the win on {{ match.date|date:'Y-m-d' }} against {{ match.loser1.user.first_name }} {{ match.loser1.user.last_name }} and {{ match.loser2.user.first_name }} {{ match.loser2.user.last_name }} by {{ match.clean_score }}.`); event.preventDefault();">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style="width: 20px; height: 20px; margin-right: 5px;"> Share
+                                    </a>
+                                </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="6">No doubles matches found.</td>
+                                <td colspan="7">No doubles matches found.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -384,6 +398,13 @@
             }
         });
     });
+
+    // Function to share message on WhatsApp
+    function shareOnWhatsApp(message) {
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
+    }
 </script>
 
 {% endblock %}

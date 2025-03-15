@@ -72,6 +72,22 @@ def submit_doubles_match(request):
                     date=match.date,
                 )
 
+            # Generate a spicy notification message
+            winner1_name = f"{winner1.user.first_name} {winner1.user.last_name}"
+            winner2_name = f"{winner2.user.first_name} {winner2.user.last_name}"
+            loser1_name = f"{loser1.user.first_name} {loser1.user.last_name}"
+            loser2_name = f"{loser2.user.first_name} {loser2.user.last_name}"
+            match_score = " - ".join([f"{w}-{l}" for w, l in match.set_scores])
+            match_date = match.date.strftime("%Y-%m-%d")
+
+            notification_message = (
+                f"🎾 New Doubles Match Submitted:\n\n"
+                f"{winner1_name} and {winner2_name} took the win on {match_date} against {loser1_name} and {loser2_name} by {match_score}."
+            )
+
+            # Add the message to Django's messaging framework
+            messages.success(request, notification_message)
+
             send_doubles_match_notification(match)  # Use the new function
             return redirect('leaderboard')
     else:
@@ -89,7 +105,24 @@ def submit_match(request):
             match.set_scores = form.cleaned_data['set_scores']
             match.submitted_by = request.user  # Set the user who submitted the match
             match.save()
-            send_match_notification(match)  # Send notification
+
+            # Generate a spicy notification message
+            winner_name = f"{match.winner.user.first_name} {match.winner.user.last_name}"
+            loser_name = f"{match.loser.user.first_name} {match.loser.user.last_name}"
+            match_score = " - ".join([f"{w}-{l}" for w, l in match.set_scores])
+            match_date = match.date.strftime("%Y-%m-%d")
+
+            notification_message = (
+                f"🎾 New Singles Match Submitted:\n\n"
+                f"{winner_name} took the win on {match_date} against {loser_name} by {match_score}."
+            )
+
+            # Send the notification (if you have a function for this)
+            send_match_notification(match)
+
+            # Add the message to Django's messaging framework
+            messages.success(request, notification_message)
+
             return redirect('leaderboard')
     else:
         form = MatchForm()

@@ -5,6 +5,35 @@
     <div class="container">
         <h1 class="my-4 text-center" style="color: #c8c097;">Leaderboard</h1>  <!-- Light beige title -->
 
+        {% if messages %}
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    {% for message in messages %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <!-- Message Content -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">{{ message }}</pre>
+                                <div class="ms-3">
+                                    <!-- Copy to Clipboard Button -->
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard(`{{ message|escapejs }}`); event.preventDefault();">
+                                        <i class="fas fa-clipboard"></i> Copy
+                                    </button>
+                                    <!-- Share on WhatsApp Button -->
+                                    <a href="#" class="btn btn-sm btn-outline-success" onclick="shareOnWhatsApp(`{{ message|escapejs }}`); event.preventDefault();">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style="width: 20px; height: 20px; margin-right: 5px;"> Share
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Close Button -->
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Singles Leaderboard -->
         <div class="border p-4 rounded mb-4" style="max-width: 800px; margin: 0 auto; background-color: #4c7563; border-color: #c8c097;">
             <h2 class="text-center mb-3" style="color: #c8c097;">Singles Leaderboard</h2>  <!-- Light beige title -->
@@ -102,4 +131,46 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Custom styles for the buttons */
+    .btn-outline-secondary, .btn-outline-success {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px; /* Space between icon and text */
+    }
+
+    /* WhatsApp logo styling */
+    .btn-outline-success img {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+</style>
+
+<script>
+    // Function to copy message to clipboard
+    function copyToClipboard(message) {
+        console.log("Copy to Clipboard function called!");  // Debugging
+        console.log("Message to copy:", message);  // Debugging
+
+        // Use the modern Clipboard API
+        navigator.clipboard.writeText(message).then(function() {
+            alert("Message copied to clipboard! 📋");
+        }).catch(function(err) {
+            console.error("Failed to copy message:", err);
+            alert("Failed to copy message. Please try again.");
+        });
+    }
+
+    // Function to share message on WhatsApp
+    function shareOnWhatsApp(message) {
+        console.log("Share on WhatsApp function called!");  // Debugging
+        console.log("Message to share:", message);  // Debugging
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
+    }
+</script>
 {% endblock %}
