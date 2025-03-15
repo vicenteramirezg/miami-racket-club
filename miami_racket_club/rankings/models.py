@@ -34,16 +34,16 @@ class Player(models.Model):
         ('Fort Lauderdale', 'Fort Lauderdale'),
         ('Shenandoah', 'Shenandoah')
     ], key=lambda x: x[1])
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, db_index=True)  # Indexed
     first_name = models.CharField(max_length=50, blank=True, null=True)
     last_name = models.CharField(max_length=50, blank=True, null=True)
     usta_rating = models.FloatField(default=3.00)
-    elo_rating = models.IntegerField(default=1000)
-    elo_rating_doubles = models.IntegerField(default=1000)
-    neighborhood = models.CharField(max_length=50, choices=NEIGHBORHOOD_CHOICES, default='Other')
-    phone_number = models.CharField(max_length=15, blank=True, null=True)  # US phone numbers only
-    created_at = models.DateTimeField(default=timezone.now)  # Automatically set when the player is created
-    is_approved = models.BooleanField(default=False)  # Tracks admin approval
+    elo_rating = models.IntegerField(default=1000, db_index=True)  # Indexed
+    elo_rating_doubles = models.IntegerField(default=1000, db_index=True)  # Indexed
+    neighborhood = models.CharField(max_length=50, choices=NEIGHBORHOOD_CHOICES, default='Other', db_index=True)  # Indexed
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    is_approved = models.BooleanField(default=False, db_index=True)  # Indexed
     last_activity = models.DateTimeField(default=timezone.now)
 
     def matches_played(self):
@@ -80,20 +80,18 @@ class Player(models.Model):
         return f"{self.first_name} {self.last_name}" if self.first_name and self.last_name else f"{self.user.username}"
 
 class Match(models.Model):
-    winner = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="won_matches")
-    loser = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="lost_matches")
+    winner = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="won_matches", db_index=True)  # Indexed
+    loser = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="lost_matches", db_index=True)  # Indexed
     winner_elo_before = models.IntegerField(null=True, blank=True)
     loser_elo_before = models.IntegerField(null=True, blank=True)
     winner_elo_after = models.IntegerField(null=True, blank=True)
     loser_elo_after = models.IntegerField(null=True, blank=True)
     set_scores = models.JSONField()
-    date = models.DateField(auto_now_add=False)  # Allow custom dates
-    notes = models.TextField(blank=True, null=True)  # Optional notes
-
+    date = models.DateField(auto_now_add=False, db_index=True)  # Indexed
+    notes = models.TextField(blank=True, null=True)
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="submitted_matches")
-    submitted_at = models.DateTimeField(auto_now_add=True)  # Timestamp when the match is submitted
-
-    is_deleted = models.BooleanField(default=False)  # Soft delete field
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False)
 
     def soft_delete(self):
         self.is_deleted = True
@@ -217,39 +215,34 @@ class Match(models.Model):
             ELOHistory.objects.filter(match=self).update(is_valid=False)
 
 class ELOHistory(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history')
-    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='elo_history')  # Link to Match
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history', db_index=True)  # Indexed
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='elo_history')
     elo_rating = models.IntegerField()
-    date = models.DateTimeField()  # Match date (not auto-updating)
-    submitted_at = models.DateTimeField(default=timezone.now)  # Track when the log was recorded
-    is_valid = models.BooleanField(default=True)  # Add this field
+    date = models.DateTimeField(db_index=True)  # Indexed
+    submitted_at = models.DateTimeField(default=timezone.now)
+    is_valid = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.player.user.username} - {self.elo_rating} on {self.date}"
 
 class MatchDoubles(models.Model):
-    winner1 = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="won_doubles_matches1")
-    winner2 = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="won_doubles_matches2")
-    loser1 = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="lost_doubles_matches1")
-    loser2 = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="lost_doubles_matches2")
-
+    winner1 = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="won_doubles_matches1", db_index=True)  # Indexed
+    winner2 = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="won_doubles_matches2", db_index=True)  # Indexed
+    loser1 = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="lost_doubles_matches1", db_index=True)  # Indexed
+    loser2 = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="lost_doubles_matches2", db_index=True)  # Indexed
     winner1_elo_before = models.IntegerField(null=True, blank=True)
     winner2_elo_before = models.IntegerField(null=True, blank=True)
     loser1_elo_before = models.IntegerField(null=True, blank=True)
     loser2_elo_before = models.IntegerField(null=True, blank=True)
-
     winner1_elo_after = models.IntegerField(null=True, blank=True)
     winner2_elo_after = models.IntegerField(null=True, blank=True)
     loser1_elo_after = models.IntegerField(null=True, blank=True)
     loser2_elo_after = models.IntegerField(null=True, blank=True)
-
     set_scores = models.JSONField()
-    date = models.DateField(auto_now_add=False)
+    date = models.DateField(auto_now_add=False, db_index=True)  # Indexed
     notes = models.TextField(blank=True, null=True)
-
     submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="submitted_doubles_matches")
     submitted_at = models.DateTimeField(auto_now_add=True)
-
     is_deleted = models.BooleanField(default=False)
 
     def soft_delete(self):
@@ -398,12 +391,12 @@ class MatchDoubles(models.Model):
             ELOHistoryDoubles.objects.filter(match=self).update(is_valid=False)
 
 class ELOHistoryDoubles(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history_doubles')
-    match = models.ForeignKey(MatchDoubles, on_delete=models.CASCADE, related_name='elo_history_doubles')  # Link to MatchDoubles
-    elo_rating_doubles = models.IntegerField()  # Correct field name
-    date = models.DateTimeField(default=timezone.now)  # Match date (not auto-updating)
-    submitted_at = models.DateTimeField(default=timezone.now)  # Track when the log was recorded
-    is_valid = models.BooleanField(default=True)  # Validity of this entry
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='elo_history_doubles', db_index=True)  # Indexed
+    match = models.ForeignKey(MatchDoubles, on_delete=models.CASCADE, related_name='elo_history_doubles')
+    elo_rating_doubles = models.IntegerField()
+    date = models.DateTimeField(db_index=True)  # Indexed
+    submitted_at = models.DateTimeField(default=timezone.now)
+    is_valid = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.player.user.username} - {self.elo_rating_doubles} on {self.date}"

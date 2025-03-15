@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, get_user_model
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, F, Count, Sum, Case, When
+from django.db.models.functions import Coalesce
+from django.db import models
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.views import LoginView, PasswordResetView
@@ -447,151 +449,145 @@ def home(request):
     }
     return render(request, 'rankings/home.html', context)
 
+def calculate_longest_streak(matches, player, is_singles=True):
+    """
+    Calculate the longest streak of wins for a player.
+    """
+    longest_streak = 0
+    current_streak = 0
+
+    for match in matches:
+        if is_singles:
+            if match.winner == player:
+                current_streak += 1
+            else:
+                if current_streak > longest_streak:
+                    longest_streak = current_streak
+                current_streak = 0
+        else:
+            if match.winner1 == player or match.winner2 == player:
+                current_streak += 1
+            else:
+                if current_streak > longest_streak:
+                    longest_streak = current_streak
+                current_streak = 0
+
+    # Check if the last match was part of the longest streak
+    if current_streak > longest_streak:
+        longest_streak = current_streak
+
+    return longest_streak
+
 @login_required
 @approved_required
 def profile(request, username):
-    player = get_object_or_404(Player, user__username=username)
-    singles_matches = Match.objects.filter((Q(winner=player) | Q(loser=player)) & Q(is_deleted=False)).order_by('-date')
+    player = get_object_or_404(
+        Player.objects.select_related('user'),  # Optimize user lookup
+        user__username=username
+    )
+
+    # Fetch singles matches with related players
+    singles_matches = Match.objects.filter(
+        (Q(winner=player) | Q(loser=player)) & Q(is_deleted=False)
+    ).select_related('winner', 'loser').order_by('-date')
+
+    # Fetch doubles matches with related players
     doubles_matches = MatchDoubles.objects.filter(
         (Q(winner1=player) | Q(winner2=player) | Q(loser1=player) | Q(loser2=player)) & Q(is_deleted=False)
-    ).order_by('-date')  # Add this line
-    # Fetch ELO history where is_valid=True
-    elo_history = ELOHistory.objects.filter(player=player, is_valid=True).order_by('submitted_at')
-    elo_history_doubles = ELOHistoryDoubles.objects.filter(player=player, is_valid=True).order_by('submitted_at')
+    ).select_related('winner1', 'winner2', 'loser1', 'loser2').order_by('-date')
 
-    # Calculate statistics
-    singles_matches_played = singles_matches.count()
-    singles_matches_won = singles_matches.filter(winner=player).count()
-    singles_matches_lost = singles_matches_played - singles_matches_won
+    # Fetch ELO history
+    elo_history = ELOHistory.objects.filter(player=player, is_valid=True).select_related('player').order_by('submitted_at')
+    elo_history_doubles = ELOHistoryDoubles.objects.filter(player=player, is_valid=True).select_related('player').order_by('submitted_at')
 
-    doubles_matches_played = doubles_matches.count()
-    doubles_matches_won = doubles_matches.filter(Q(winner1=player) | Q(winner2=player)).count()
-    doubles_matches_lost = doubles_matches_played - doubles_matches_won
-
-    singles_sets_won = 0
-    singles_sets_lost = 0
-    singles_games_won = 0
-    singles_games_lost = 0
-
-    doubles_sets_won = 0
-    doubles_sets_lost = 0
-    doubles_games_won = 0
-    doubles_games_lost = 0
+    # Calculate singles statistics
+    singles_stats = {
+        'matches_played': singles_matches.count(),
+        'matches_won': singles_matches.filter(winner=player).count(),
+        'sets_won': 0,
+        'sets_lost': 0,
+        'games_won': 0,
+        'games_lost': 0,
+    }
 
     for match in singles_matches:
         for set_score in match.set_scores:
-            if match.winner == player:  # If player won the match
-                singles_sets_won += 1 if set_score[0] > set_score[1] else 0
-                singles_sets_lost += 1 if set_score[0] < set_score[1] else 0
-                singles_games_won += set_score[0]
-                singles_games_lost += set_score[1]
-            else:  # If player lost the match
-                singles_sets_won += 1 if set_score[1] > set_score[0] else 0
-                singles_sets_lost += 1 if set_score[1] < set_score[0] else 0
-                singles_games_won += set_score[1]
-                singles_games_lost += set_score[0]
+            if match.winner == player:
+                singles_stats['sets_won'] += 1 if set_score[0] > set_score[1] else 0
+                singles_stats['sets_lost'] += 1 if set_score[0] < set_score[1] else 0
+                singles_stats['games_won'] += set_score[0]
+                singles_stats['games_lost'] += set_score[1]
+            else:
+                singles_stats['sets_won'] += 1 if set_score[1] > set_score[0] else 0
+                singles_stats['sets_lost'] += 1 if set_score[1] < set_score[0] else 0
+                singles_stats['games_won'] += set_score[1]
+                singles_stats['games_lost'] += set_score[0]
+
+    # Calculate doubles statistics
+    doubles_stats = {
+        'matches_played': doubles_matches.count(),
+        'matches_won': doubles_matches.filter(Q(winner1=player) | Q(winner2=player)).count(),
+        'sets_won': 0,
+        'sets_lost': 0,
+        'games_won': 0,
+        'games_lost': 0,
+    }
 
     for match in doubles_matches:
         for set_score in match.set_scores:
-            if match.winner1 == player or match.winner2 == player:  # If player is on the winning team
-                doubles_sets_won += 1 if set_score[0] > set_score[1] else 0
-                doubles_sets_lost += 1 if set_score[0] < set_score[1] else 0
-                doubles_games_won += set_score[0]
-                doubles_games_lost += set_score[1]
-            else:  # If player is on the losing team
-                doubles_sets_won += 1 if set_score[1] > set_score[0] else 0
-                doubles_sets_lost += 1 if set_score[1] < set_score[0] else 0
-                doubles_games_won += set_score[1]
-                doubles_games_lost += set_score[0]
+            if match.winner1 == player or match.winner2 == player:
+                doubles_stats['sets_won'] += 1 if set_score[0] > set_score[1] else 0
+                doubles_stats['sets_lost'] += 1 if set_score[0] < set_score[1] else 0
+                doubles_stats['games_won'] += set_score[0]
+                doubles_stats['games_lost'] += set_score[1]
+            else:
+                doubles_stats['sets_won'] += 1 if set_score[1] > set_score[0] else 0
+                doubles_stats['sets_lost'] += 1 if set_score[1] < set_score[0] else 0
+                doubles_stats['games_won'] += set_score[1]
+                doubles_stats['games_lost'] += set_score[0]
 
-    # Calculate totals
-    singles_sets_played = singles_sets_won + singles_sets_lost
-    singles_games_played = singles_games_won + singles_games_lost
+    # Calculate streaks
+    singles_current_streak = singles_matches.filter(winner=player).count()
+    doubles_current_streak = doubles_matches.filter(Q(winner1=player) | Q(winner2=player)).count()
 
-    doubles_sets_played = doubles_sets_won + doubles_sets_lost
-    doubles_games_played = doubles_games_won + doubles_games_lost
+    # Calculate longest streaks
+    singles_longest_streak = calculate_longest_streak(singles_matches, player, is_singles=True)
+    doubles_longest_streak = calculate_longest_streak(doubles_matches, player, is_singles=False)
 
     # Calculate percentages
-    singles_match_win_percentage = (singles_matches_won / singles_matches_played * 100) if singles_matches_played > 0 else 0
-    singles_set_win_percentage = (singles_sets_won / singles_sets_played * 100) if singles_sets_played > 0 else 0
-    singles_game_win_percentage = (singles_games_won / singles_games_played * 100) if singles_games_played > 0 else 0
+    singles_match_win_percentage = round((singles_stats['matches_won'] / singles_stats['matches_played'] * 100), 1) if singles_stats['matches_played'] > 0 else 0
+    singles_set_win_percentage = round((singles_stats['sets_won'] / (singles_stats['sets_won'] + singles_stats['sets_lost']) * 100), 1) if (singles_stats['sets_won'] + singles_stats['sets_lost']) > 0 else 0
+    singles_game_win_percentage = round((singles_stats['games_won'] / (singles_stats['games_won'] + singles_stats['games_lost']) * 100), 1) if (singles_stats['games_won'] + singles_stats['games_lost']) > 0 else 0
 
-    doubles_match_win_percentage = (doubles_matches_won / doubles_matches_played * 100) if doubles_matches_played > 0 else 0
-    doubles_set_win_percentage = (doubles_sets_won / doubles_sets_played * 100) if doubles_sets_played > 0 else 0
-    doubles_game_win_percentage = (doubles_games_won / doubles_games_played * 100) if doubles_games_played > 0 else 0
-
-    # Calculate Current Streak (most recent wins until a loss)
-    singles_current_streak = 0
-    for match in singles_matches:
-        if match.winner == player:
-            singles_current_streak += 1
-        else:
-            break  # Stop when the first loss is encountered
-
-    doubles_current_streak = 0
-    for match in doubles_matches:
-        if match.winner1 == player or match.winner2 == player:
-            doubles_current_streak += 1
-        else:
-            break  # Stop when the first loss is encountered
-
-    # Calculate Longest Streak Ever (longest sequence of wins in history)
-    singles_longest_streak = 0
-    singles_current_streak_temp = 0
-    for match in singles_matches:
-        if match.winner == player:
-            singles_current_streak_temp += 1
-        else:
-            singles_longest_streak = max(singles_longest_streak, singles_current_streak_temp)
-            singles_current_streak_temp = 0  # Reset streak after a loss
-    singles_longest_streak = max(singles_longest_streak, singles_current_streak_temp)  # Check in case the longest streak ends with wins
-
-    doubles_longest_streak = 0
-    doubles_current_streak_temp = 0
-    for match in doubles_matches:
-        if match.winner1 == player or match.winner2 == player:
-            doubles_current_streak_temp += 1
-        else:
-            doubles_longest_streak = max(doubles_longest_streak, doubles_current_streak_temp)
-            doubles_current_streak_temp = 0  # Reset streak after a loss
-    doubles_longest_streak = max(doubles_longest_streak, doubles_current_streak_temp)  # Check in case the longest streak ends with wins
+    doubles_match_win_percentage = round((doubles_stats['matches_won'] / doubles_stats['matches_played'] * 100), 1) if doubles_stats['matches_played'] > 0 else 0
+    doubles_set_win_percentage = round((doubles_stats['sets_won'] / (doubles_stats['sets_won'] + doubles_stats['sets_lost']) * 100), 1) if (doubles_stats['sets_won'] + doubles_stats['sets_lost']) > 0 else 0
+    doubles_game_win_percentage = round((doubles_stats['games_won'] / (doubles_stats['games_won'] + doubles_stats['games_lost']) * 100), 1) if (doubles_stats['games_won'] + doubles_stats['games_lost']) > 0 else 0
 
     context = {
         'player': player,
         'singles_matches': singles_matches,
         'doubles_matches': doubles_matches,
-        'singles_matches_played': singles_matches_played,
-        'singles_matches_won': singles_matches_won,
-        'singles_matches_lost': singles_matches_lost,
-        'singles_sets_won': singles_sets_won,
-        'singles_sets_lost': singles_sets_lost,
-        'singles_sets_played': singles_sets_played,
-        'singles_games_won': singles_games_won,
-        'singles_games_lost': singles_games_lost,
-        'singles_games_played': singles_games_played,
-        'singles_match_win_percentage': round(singles_match_win_percentage, 1),
-        'singles_set_win_percentage': round(singles_set_win_percentage, 1),
-        'singles_game_win_percentage': round(singles_game_win_percentage, 1),
         'elo_history': elo_history,
         'elo_history_doubles': elo_history_doubles,
+        'singles_stats': singles_stats,
+        'doubles_stats': doubles_stats,
+        'singles_match_win_percentage': singles_match_win_percentage,
+        'singles_set_win_percentage': singles_set_win_percentage,
+        'singles_game_win_percentage': singles_game_win_percentage,
+        'singles_matches_played': singles_stats['matches_played'],
+        'singles_sets_played': singles_stats['sets_won'] + singles_stats['sets_lost'],
+        'singles_games_played': singles_stats['games_won'] + singles_stats['games_lost'],
         'singles_current_streak': singles_current_streak,
         'singles_longest_streak': singles_longest_streak,
-        'doubles_matches_played': doubles_matches_played,
-        'doubles_matches_won': doubles_matches_won,
-        'doubles_matches_lost': doubles_matches_lost,
-        'doubles_sets_won': doubles_sets_won,
-        'doubles_sets_lost': doubles_sets_lost,
-        'doubles_sets_played': doubles_sets_played,
-        'doubles_games_won': doubles_games_won,
-        'doubles_games_lost': doubles_games_lost,
-        'doubles_games_played': doubles_games_played,
-        'doubles_match_win_percentage': round(doubles_match_win_percentage, 1),
-        'doubles_set_win_percentage': round(doubles_set_win_percentage, 1),
-        'doubles_game_win_percentage': round(doubles_game_win_percentage, 1),
+        'doubles_match_win_percentage': doubles_match_win_percentage,
+        'doubles_set_win_percentage': doubles_set_win_percentage,
+        'doubles_game_win_percentage': doubles_game_win_percentage,
+        'doubles_matches_played': doubles_stats['matches_played'],
+        'doubles_sets_played': doubles_stats['sets_won'] + doubles_stats['sets_lost'],
+        'doubles_games_played': doubles_stats['games_won'] + doubles_stats['games_lost'],
         'doubles_current_streak': doubles_current_streak,
-        'doubles_longest_streak': doubles_longest_streak
+        'doubles_longest_streak': doubles_longest_streak,
     }
-
     return render(request, 'rankings/profile.html', context)
 
 class SignUpView(CreateView):
