@@ -98,14 +98,23 @@ def submit_match(request):
 @login_required
 @approved_required
 def leaderboard(request):
-    # Get players ordered by singles ELO rating
-    singles_players = Player.objects.order_by('-elo_rating')  # Highest ELO first
-    # Get players ordered by doubles ELO rating
-    doubles_players = Player.objects.order_by('-elo_rating_doubles')  # Highest ELO first
+    # Fetch only necessary fields for singles and doubles leaderboards
+    singles_players = Player.objects.order_by('-elo_rating').only('first_name', 'last_name', 'elo_rating')
+    doubles_players = Player.objects.order_by('-elo_rating_doubles').only('first_name', 'last_name', 'elo_rating_doubles')
+
+    # Paginate singles players
+    singles_paginator = Paginator(singles_players, 25)  # 25 players per page
+    singles_page_number = request.GET.get('singles_page')
+    singles_page = singles_paginator.get_page(singles_page_number)
+
+    # Paginate doubles players
+    doubles_paginator = Paginator(doubles_players, 25)  # 25 players per page
+    doubles_page_number = request.GET.get('doubles_page')
+    doubles_page = doubles_paginator.get_page(doubles_page_number)
 
     context = {
-        'singles_players': singles_players,
-        'doubles_players': doubles_players,
+        'singles_page': singles_page,
+        'doubles_page': doubles_page,
     }
     return render(request, 'rankings/leaderboard.html', context)
 
@@ -438,10 +447,21 @@ def send_doubles_match_notification(match):
 
 @approved_required
 def home(request):
-    # Get recent singles matches (e.g., last 10 matches)
-    recent_singles_matches = Match.objects.order_by('-date')[:5]
-    # Get recent doubles matches (e.g., last 10 matches)
-    recent_doubles_matches = MatchDoubles.objects.order_by('-date')[:5]
+    # Get recent singles matches (last 5 matches) with related fields optimized
+    recent_singles_matches = (
+        Match.objects
+        .select_related('winner', 'loser')  # Optimize foreign key lookups
+        .only('date', 'winner__first_name', 'winner__last_name', 'loser__first_name', 'loser__last_name', 'set_scores')  # Fetch only necessary fields
+        .order_by('-date')[:5]
+    )
+
+    # Get recent doubles matches (last 5 matches) with related fields optimized
+    recent_doubles_matches = (
+        MatchDoubles.objects
+        .select_related('winner1', 'winner2', 'loser1', 'loser2')  # Optimize foreign key lookups
+        .only('date', 'winner1__first_name', 'winner1__last_name', 'winner2__first_name', 'winner2__last_name', 'loser1__first_name', 'loser1__last_name', 'loser2__first_name', 'loser2__last_name', 'set_scores')  # Fetch only necessary fields
+        .order_by('-date')[:5]
+    )
 
     context = {
         'recent_singles_matches': recent_singles_matches,
@@ -770,9 +790,9 @@ class CustomLoginView(LoginView):
             return redirect('pending_approval')
 
 @login_required
-@approved_required   
+@approved_required
 def player_directory(request):
-    # Get all players ordered alphabetically by default
+    # Get all approved players ordered alphabetically by default
     players = Player.objects.filter(is_approved=True).order_by('first_name', 'last_name')
 
     # Initialize filter variables
@@ -788,6 +808,7 @@ def player_directory(request):
     if max_rating:
         players = players.filter(usta_rating__lte=float(max_rating))
 
+    # Paginate the filtered players
     paginator = Paginator(players, 25)  # Show 25 players per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -800,8 +821,7 @@ def player_directory(request):
     unique_neighborhoods = Player.objects.values_list('neighborhood', flat=True).distinct().order_by('neighborhood')
 
     context = {
-        'players': players,
-        'page_obj': page_obj,
+        'page_obj': page_obj,  # Pass the paginated players
         'unique_neighborhoods': unique_neighborhoods,
         'selected_neighborhoods': neighborhoods,
         'min_rating': float(min_rating),

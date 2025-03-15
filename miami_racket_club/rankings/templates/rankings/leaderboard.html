@@ -17,9 +17,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for player in singles_players %}
+                    {% for player in singles_page %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
+                        <td>{{ forloop.counter0|add:singles_page.start_index }}</td>
                         <td>
                             <a href="{% url 'profile' player.user.username %}">{{ player.user.first_name }} {{ player.user.last_name }}</a>
                         </td>
@@ -32,6 +32,25 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+            <!-- Singles Pagination -->
+            <div class="pagination justify-content-center mt-3">
+                <span class="step-links">
+                    {% if singles_page.has_previous %}
+                        <a href="?singles_page=1" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">&laquo; first</a>
+                        <a href="?singles_page={{ singles_page.previous_page_number }}" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">previous</a>
+                    {% endif %}
+
+                    <span class="current" style="color: #c8c097;">
+                        Page {{ singles_page.number }} of {{ singles_page.paginator.num_pages }}.
+                    </span>
+
+                    {% if singles_page.has_next %}
+                        <a href="?singles_page={{ singles_page.next_page_number }}" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">next</a>
+                        <a href="?singles_page={{ singles_page.paginator.num_pages }}" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
         </div>
 
         <!-- Doubles Leaderboard -->
@@ -46,9 +65,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for player in doubles_players %}
+                    {% for player in doubles_page %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
+                        <td>{{ forloop.counter0|add:doubles_page.start_index }}</td>
                         <td>
                             <a href="{% url 'profile' player.user.username %}">{{ player.user.first_name }} {{ player.user.last_name }}</a>
                         </td>
@@ -61,6 +80,25 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+            <!-- Doubles Pagination -->
+            <div class="pagination justify-content-center mt-3">
+                <span class="step-links">
+                    {% if doubles_page.has_previous %}
+                        <a href="?doubles_page=1" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">&laquo; first</a>
+                        <a href="?doubles_page={{ doubles_page.previous_page_number }}" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">previous</a>
+                    {% endif %}
+
+                    <span class="current" style="color: #c8c097;">
+                        Page {{ doubles_page.number }} of {{ doubles_page.paginator.num_pages }}.
+                    </span>
+
+                    {% if doubles_page.has_next %}
+                        <a href="?doubles_page={{ doubles_page.next_page_number }}" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">next</a>
+                        <a href="?doubles_page={{ doubles_page.paginator.num_pages }}" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
         </div>
     </div>
 </div>

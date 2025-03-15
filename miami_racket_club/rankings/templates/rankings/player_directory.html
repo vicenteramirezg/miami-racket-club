@@ -81,6 +81,25 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+            <!-- Pagination -->
+            <div class="pagination justify-content-center mt-4">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1&neighborhood={{ selected_neighborhoods|join:',' }}&min_rating={{ min_rating }}&max_rating={{ max_rating }}" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">&laquo; first</a>
+                        <a href="?page={{ page_obj.previous_page_number }}&neighborhood={{ selected_neighborhoods|join:',' }}&min_rating={{ min_rating }}&max_rating={{ max_rating }}" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">previous</a>
+                    {% endif %}
+
+                    <span class="current" style="color: #104730;">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}&neighborhood={{ selected_neighborhoods|join:',' }}&min_rating={{ min_rating }}&max_rating={{ max_rating }}" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}&neighborhood={{ selected_neighborhoods|join:',' }}&min_rating={{ min_rating }}&max_rating={{ max_rating }}" class="btn btn-sm" style="background-color: #c8c097; color: #104730;">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
         </div>
     </div>
 </div>
